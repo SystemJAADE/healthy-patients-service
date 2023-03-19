@@ -46,7 +46,7 @@ nano ext/nginx.conf
 
 Luego, para orquestar los contenedores con docker-compose usar:
 
-```
+```sh
 # Iniciamos todos los contenedores en modo detached
 docker-compose up -d
 # Listo!
@@ -54,13 +54,13 @@ docker-compose up -d
 
 En caso de cambios en el docker-compose.yml
 
-```
+```sh
 docker-compose down
 ```
 
 Y luego ejecutar
 
-```
+```sh
 docker-compose up -d -V --build
 ```
 
