@@ -1,0 +1,17 @@
+# Versionamiento y metadata
+.git
+.gitignore
+.dockerignore
+
+# Dependencias al compilarse
+dist
+node_modules
+coverage
+
+# Archivos no necesarios para producción
+.editorconfig
+Dockerfile
+README.md
+tslint.json
+nodemon.json
+.env

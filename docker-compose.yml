@@ -1,0 +1,60 @@
+services:
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_HOST: ${DB_HOST}
+      MYSQL_PORT: ${DB_PORT}
+      MYSQL_RANDOM_ROOT_PASSWORD: 'true'
+    volumes:
+      - db-data:/var/lib/mysql
+    healthcheck:
+      test: '/usr/bin/mysql --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD --execute "SHOW DATABASES;"'
+      interval: 2s
+      timeout: 20s
+      retries: 10
+    # Descomentar para exponer el puerto a la máquina host
+    #ports:
+    #- ${DB_PORT}:${DB_PORT}
+
+  # Si se desea usar el contenedor en modo producción, modificar los campos con XXX
+  api:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: production # XXX: development/production
+    depends_on:
+      mysql:
+        condition: service_healthy
+    tty: true
+    command: ['/bin/sh', '/usr/src/app/bin/start-prod.sh'] # XXX: start-dev.sh/start-prod.sh
+    env_file:
+      - .env
+    volumes:
+      - .env:/usr/src/app/.env:ro
+      - /usr/src/app/node_modules
+      - .:/usr/src/app
+    # Descomentar para exponer el puerto a la máquina host
+    #ports:
+    #- ${APP_PORT}
+
+  nginx:
+    image: nginx
+    depends_on:
+      - api
+    volumes:
+      - ./ext/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${SSL_CERT_PATH}:/etc/ssl/certs/healthy.pem:ro
+      - ${SSL_KEY_PATH}:/etc/ssl/private/healthy.key:ro
+    ports:
+      - 80:80
+      - 443:443
+
+volumes:
+  db-data:
+
+networks:
+  default:
+    name: healthy-next-network
