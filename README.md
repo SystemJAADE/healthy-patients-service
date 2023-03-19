@@ -24,7 +24,7 @@ Para facilitar el manejo de la app (Ejecución y compilación) se recomienda ins
 
 ## Configurando las variables de entorno
 
-```ssh
+```sh
 # Copiamos el .env de ejemplo
 cp .env.example .env
 
@@ -34,7 +34,7 @@ nano .env
 
 ## Configurando un reverse proxy con nginx
 
-```ssh
+```sh
 # Copiamos el archivo de configuracion de ejemplo
 cp ext/nginx.conf.example ext/nginx.conf
 
@@ -161,7 +161,7 @@ sudo nginx -s reload
 
 ## Configurando las variables de entorno
 
-```ssh
+```sh
 # Copiamos el .env de ejemplo
 cp .env.example .env
 
