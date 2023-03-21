@@ -1,0 +1,45 @@
+name: 'PR Commit Message Check'
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+
+jobs:
+  check-commit-message:
+    name: Check commit message
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check commit type
+        uses: gsactions/commit-message-checker@v2
+        with:
+          pattern: '^(feat|fix|docs|style|refactor|test|chore): .*$'
+          error: 'Commit message must start with one of the following: feat, fix, docs, style, refactor, test, chore'
+          flags: 's'
+          excludeDescription: 'true'
+          excludeTitle: 'true'
+          checkAllCommitMessages: 'true'
+          accessToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check commit first word capitalization
+        uses: gsactions/commit-message-checker@v2
+        with:
+          pattern: '^[^:]+: [A-Z].*$'
+          error: 'Commit message must start with a capital letter'
+          flags: 's'
+          excludeDescription: 'true'
+          excludeTitle: 'true'
+          checkAllCommitMessages: 'true'
+          accessToken: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check commit length
+        uses: gsactions/commit-message-checker@v2
+        with:
+          pattern: '^[^:]+: [^\n]{0,50}(\n[^\n]{0,72})*$'
+          error: 'The maximum line length of 50 (72) characters is exceeded'
+          flags: 'g'
+          excludeDescription: 'true'
+          excludeTitle: 'true'
+          checkAllCommitMessages: 'true'
+          accessToken: ${{ secrets.GITHUB_TOKEN }}
