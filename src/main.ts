@@ -18,7 +18,7 @@ async function bootstrap() {
   );
 
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Healthy-next API TS')
+    .setTitle('Healthy patients service')
     .setDescription('TODO Description')
     .setVersion('0.0.1')
     .build();
