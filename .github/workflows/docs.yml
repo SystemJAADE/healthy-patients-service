@@ -16,7 +16,7 @@ env:
 
 jobs:
   update-wiki:
-    if: github.repository == 'SystemJAADE/healthy-next-api-ts'
+    if: github.repository == 'SystemJAADE/healthy-patients-service'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source repo
