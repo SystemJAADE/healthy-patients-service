@@ -1,36 +1,17 @@
-import { Exclude } from 'class-transformer';
 import { AuditFields } from 'src/helpers/audit-fields.helper';
+import { Role } from 'src/helpers/role.helper';
 import { RecoveryKey } from 'src/oauth/recovery-key/recovery-key.entity';
 import { RefreshToken } from 'src/oauth/refresh-token/refresh-token.entity';
+import { Credential } from 'src/credentials/credential.entity';
 import {
-  BeforeInsert,
-  BeforeUpdate,
   Column,
   Entity,
   Index,
+  JoinColumn,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
-export interface IJwtPayload {
-  id: string;
-  username: string;
-  role: Role;
-  is_blocked: boolean;
-}
-
-/**
- * TODO:
- * - Pasar esto a su propio .ts
- * - Almacenarlos como enteros en vez de strings para mas rendimiento
- * - Tal vez convertirlo a un enum bitwise para poder tener varios roles a la vez
- */
-export enum Role {
-  NOT_FULLY_REGISTERED = 'not_fully_registered',
-  PATIENT = 'patient',
-  DOCTOR = 'doctor',
-  ADMIN = 'admin',
-}
 
 /**
  * TODO:
@@ -43,18 +24,10 @@ export enum Gender {
   NEITHER = 3,
 }
 
-@Entity('users')
-export class User extends AuditFields {
+@Entity('accounts')
+export class Account extends AuditFields {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column({ length: 32 })
-  @Index({ unique: true })
-  username: string;
-
-  @Column({ length: 64 })
-  @Exclude()
-  password: string;
 
   @Column({
     type: 'enum',
@@ -68,16 +41,6 @@ export class User extends AuditFields {
     default: () => 'false',
   })
   is_blocked: boolean;
-
-  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user, {
-    nullable: true,
-  })
-  refresh_tokens?: RefreshToken[] | null;
-
-  @OneToMany(() => RecoveryKey, (recovery_key) => recovery_key.user, {
-    nullable: true,
-  })
-  recovery_keys?: RecoveryKey[] | null;
 
   /**
    * Apellido paterno
@@ -111,6 +74,9 @@ export class User extends AuditFields {
 
   // TODO: Agregar tipo de documento de identidad
 
+  /**
+   * Genero (Masculino, Femenino, Otro)
+   */
   @Column({
     type: 'enum',
     enum: Gender,
@@ -122,7 +88,7 @@ export class User extends AuditFields {
    * Celular
    */
   @Column({ length: 32, nullable: true })
-  phone?: string | null;
+  cell_phone?: string | null;
 
   /**
    * Teléfono de casa
@@ -130,18 +96,31 @@ export class User extends AuditFields {
   @Column({ length: 32, nullable: true })
   home_phone?: string | null;
 
-  @BeforeInsert()
-  @BeforeUpdate()
-  protected loginToLowercase() {
-    this.username = this.username.toLowerCase();
-  }
+  /**
+   * Credenciales de acceso (En este caso son usuario y contraseña)
+   */
+  @OneToOne(
+    () => Credential,
+    (credential) => credential.account /*{
+    cascade: true,
+  }*/,
+  )
+  @JoinColumn({ name: 'credential_id' })
+  credential?: Credential | null;
 
-  public jsonForJWT(): IJwtPayload {
-    return {
-      id: this.id,
-      username: this.username,
-      role: this.role,
-      is_blocked: this.is_blocked,
-    };
-  }
+  /**
+   * Tokens de refresco
+   */
+  @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.account, {
+    nullable: true,
+  })
+  refresh_tokens?: RefreshToken[] | null;
+
+  /**
+   * Tokens de recuperación de contraseña
+   */
+  @OneToMany(() => RecoveryKey, (recovery_key) => recovery_key.account, {
+    nullable: true,
+  })
+  recovery_keys?: RecoveryKey[] | null;
 }

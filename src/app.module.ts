@@ -2,7 +2,8 @@ import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import * as Joi from 'joi';
-import { UsersModule } from './users/users.module';
+import { CredentialsModule } from './credentials/credentials.module';
+import { AccountsModule } from './accounts/accounts.module';
 import { OauthModule } from './oauth/oauth.module';
 import { OAuthMiddleware } from './oauth/oauth.middleware';
 import { RatelimitModule } from './ratelimit/ratelimit.module';
@@ -24,7 +25,8 @@ import { RatelimitModule } from './ratelimit/ratelimit.module';
     }),
     RatelimitModule,
     DatabaseModule,
-    UsersModule,
+    CredentialsModule,
+    AccountsModule,
     OauthModule,
   ],
   controllers: [],
