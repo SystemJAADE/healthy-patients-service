@@ -1,6 +1,6 @@
-import { AuditFields } from 'src/helpers/audit-fields.helper';
-import { User } from 'src/users/user.entity';
+import { Account } from 'src/accounts/account.entity';
 import {
+  BaseEntity,
   Column,
   Entity,
   Index,
@@ -10,15 +10,15 @@ import {
 } from 'typeorm';
 
 @Entity('refresh_tokens')
-export class RefreshToken extends AuditFields {
+export class RefreshToken extends BaseEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Index()
   @Column('uuid')
-  user_id: string;
+  account_id: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @ManyToOne(() => Account, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id' })
+  account: Account;
 }

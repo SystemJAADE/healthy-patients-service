@@ -1,4 +1,4 @@
-import { User } from 'src/users/user.entity';
+import { Account } from 'src/accounts/account.entity';
 import {
   BaseEntity,
   Column,
@@ -16,9 +16,9 @@ export class RecoveryKey extends BaseEntity {
 
   @Index()
   @Column('uuid')
-  user_id: number;
+  account_id: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @ManyToOne(() => Account, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'account_id' })
+  account: Account;
 }

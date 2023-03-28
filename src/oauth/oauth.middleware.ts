@@ -1,8 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-
+import { IJwtPayload } from 'src/credentials/credential.entity';
 import { verify } from 'jsonwebtoken';
-
 import { IAccessToken } from './oauth.service';
 import { ConfigService } from '@nestjs/config';
 import {
@@ -11,8 +10,6 @@ import {
   unauthorized,
   authorization_failed,
 } from '../errors';
-import { IJwtPayload } from 'src/users/user.entity';
-
 @Injectable()
 export class OAuthMiddleware implements NestMiddleware {
   constructor(private configService: ConfigService) {}
