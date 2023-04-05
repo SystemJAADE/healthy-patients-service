@@ -24,12 +24,12 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-      target: production # XXX: development/production
+      target: development # XXX: development/production
     depends_on:
       mysql:
         condition: service_healthy
     tty: true
-    command: ['/bin/sh', '/usr/src/app/bin/start-prod.sh'] # XXX: start-dev.sh/start-prod.sh
+    command: ['/bin/sh', '/usr/src/app/bin/start-dev.sh'] # XXX: start-dev.sh/start-prod.sh
     env_file:
       - .env
     volumes:
