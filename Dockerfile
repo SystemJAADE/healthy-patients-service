@@ -5,7 +5,7 @@
 FROM node:lts-bullseye-slim AS development
 
 # Instalar las dependencias necesarias para hot reloading
-RUN apt-get update && apt-get install -y procps make
+RUN apt-get update && apt-get install -y procps make openssl
 
 # Crear la carpeta de la app
 WORKDIR /usr/src/app
@@ -14,8 +14,13 @@ WORKDIR /usr/src/app
 # Copiar esto primero evita volver a ejecutar npm install en cada cambio de código.
 COPY --chown=node:node package.json yarn.lock Makefile ./
 
+COPY --chown=node:node prisma ./prisma
+
 # Instalas todas las dependencias necesarias de la aplicación usando `npm ci` en ves de `npm install`
 RUN make install-dev
+
+# Generamos el cliente de prisma
+RUN npx prisma generate
 
 # Copiar todo el codigo fuente
 COPY --chown=node:node . .

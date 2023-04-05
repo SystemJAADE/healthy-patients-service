@@ -1,0 +1,71 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["debian-openssl-1.0.x"]
+}
+
+datasource db {
+  provider          = "mysql"
+  url               = env("DB_URL")
+}
+
+model Account {
+  id               String         @id @default(uuid()) @db.VarChar(36)
+  role             Role           @default(NOT_FULLY_REGISTERED)
+  isBlocked        Boolean        @map("is_blocked") @db.TinyInt()
+  firstSurname     String?        @map("first_surname") @db.VarChar(64)
+  secondSurname    String?        @map("second_surname") @db.VarChar(64)
+  firstName        String?        @map("first_name") @db.VarChar(64)
+  middleName       String?        @map("middle_name") @db.VarChar(64)
+  documentIdentity String?        @map("document_identity") @db.VarChar(32)
+  gender           Gender?
+  cellPhone        String?        @map("cell_phone") @db.VarChar(32)
+  homePhone        String?        @map("home_phone") @db.VarChar(32)
+  credentialId     String?        @unique @map("credential_id") @db.VarChar(36)
+  credential       Credential?    @relation(fields: [credentialId], references: [id])
+  refreshTokens    RefreshToken[]
+  recoveryKeys     RecoveryKey[]
+
+  @@map("accounts")
+}
+
+model Credential {
+  id         String   @id @default(uuid()) @db.VarChar(36)
+  identifier String   @unique() @db.VarChar(32)
+  secret     String   @db.VarChar(64)
+  account    Account?
+
+  @@map("credentials")
+}
+
+model RefreshToken {
+  id        String  @id @default(uuid()) @db.VarChar(36)
+  accountId String  @map("account_id") @db.VarChar(36)
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model RecoveryKey {
+  id        String  @id @default(uuid()) @db.VarChar(36)
+  accountId String  @map("account_id") @db.VarChar(36)
+  account   Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@map("recovery_keys")
+}
+
+enum Role {
+  NOT_FULLY_REGISTERED @map("not_fully_registered")
+  PATIENT              @map("patient")
+  DOCTOR               @map("doctor")
+  ADMIN                @map("admin")
+
+  @@map("role")
+}
+
+enum Gender {
+  MALE    @map("1")
+  FEMALE  @map("2")
+  NEITHER @map("3")
+
+  @@map("gender")
+}

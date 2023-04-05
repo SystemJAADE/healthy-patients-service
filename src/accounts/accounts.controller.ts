@@ -6,7 +6,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
-import { Role, RoleGuard } from 'src/helpers/role.helper';
+import { Role } from '@prisma/client';
+import { RoleGuard } from 'src/helpers/role.helper';
 import { AccountsService } from './accounts.service';
 
 @Controller('accounts')

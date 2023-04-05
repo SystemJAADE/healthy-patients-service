@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { Credential } from './credential.entity';
 import { CredentialsService } from './credentials.service';
 import { CredentialsController } from './credentials.controller';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { PrismaModule } from 'src/prisma/prisma.module';
+import { CredentialsRepository } from './credentials.repository';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Credential])],
-  providers: [CredentialsService],
-  exports: [CredentialsService],
+  imports: [PrismaModule],
+  providers: [CredentialsService, CredentialsRepository],
+  exports: [CredentialsService, CredentialsRepository],
   controllers: [CredentialsController],
 })
 export class CredentialsModule {}
