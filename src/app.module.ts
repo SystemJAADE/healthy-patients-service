@@ -1,6 +1,6 @@
 import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { DatabaseModule } from './database/database.module';
+import { PrismaModule } from './prisma/prisma.module';
 import * as Joi from 'joi';
 import { CredentialsModule } from './credentials/credentials.module';
 import { AccountsModule } from './accounts/accounts.module';
@@ -24,7 +24,7 @@ import { RatelimitModule } from './ratelimit/ratelimit.module';
       }),
     }),
     RatelimitModule,
-    DatabaseModule,
+    PrismaModule,
     CredentialsModule,
     AccountsModule,
     OauthModule,

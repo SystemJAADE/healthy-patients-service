@@ -1,21 +1,17 @@
-import { Repository } from 'typeorm';
-import { Credential } from './credential.entity';
-import { InjectRepository } from '@nestjs/typeorm';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { CredentialsRepository } from './credentials.repository';
+import { Credential } from '@prisma/client';
 
 @Injectable()
 export class CredentialsService {
-  constructor(
-    @InjectRepository(Credential)
-    private credentialsRepository: Repository<Credential>,
-  ) {}
+  constructor(private repository: CredentialsRepository) {}
 
   public async findAll(): Promise<Credential[]> {
-    return this.credentialsRepository.find();
+    return this.repository.getCredentials({});
   }
 
   public async findByID(id: string): Promise<Credential> {
-    const credential = await this.credentialsRepository.findOneBy({ id });
+    const credential = await this.repository.getCredential({ id });
     if (!credential) {
       throw new HttpException('Account not found', HttpStatus.NOT_FOUND);
     }

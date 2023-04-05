@@ -1,9 +1,5 @@
 import { Injectable, Req } from '@nestjs/common';
 import { checkPassword, passwordToHash } from 'src/helpers/password.helper';
-import { IJwtPayload } from 'src/credentials/credential.entity';
-import { DataSource, DeepPartial, EntityManager } from 'typeorm';
-import { RecoveryKey } from './recovery-key/recovery-key.entity';
-import { RefreshToken } from './refresh-token/refresh-token.entity';
 import { Algorithm, sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
@@ -11,7 +7,6 @@ import { Request } from 'express';
 import { validateDTO } from 'src/helpers/validate.helper';
 import { SignInByPasswordDto } from './dto/sign-in-by-password.dto';
 import { SignInByRefreshTokenDto } from './dto/sign-in-by-refresh-token.dto';
-import { Account } from 'src/accounts/account.entity';
 import {
   access_token_expired_signature,
   account_blocked,
@@ -19,19 +14,28 @@ import {
   bad_request,
   refresh_token_expired_signature,
 } from 'src/errors';
+import { Account, Credential, RecoveryKey, Role } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
 export interface IJWTToken {
   iat: number;
   exp: number;
   jti: string;
 }
 
+export interface IJWTPayload {
+  id: string;
+  identifier: string;
+  role: Role;
+  is_blocked: boolean;
+}
+
 export interface IAccessToken extends IJWTToken {
-  current_user: IJwtPayload;
+  current_account: IJWTPayload;
   token_type: 'access';
 }
 
 export interface IRefreshToken extends IJWTToken {
-  current_user: { id: string };
+  current_account: { id: string };
   token_type: 'refresh';
 }
 
@@ -39,12 +43,12 @@ export interface IRefreshToken extends IJWTToken {
 export class OauthService {
   constructor(
     private configService: ConfigService,
-    private dataSource: DataSource,
+    private prisma: PrismaService,
   ) {}
 
   public async registration(username: string, password: string) {
-    return await this.dataSource.transaction(async (entityManager) => {
-      const existUser = await entityManager.getRepository(Account).findOne({
+    return await this.prisma.$transaction(async (tx) => {
+      const existingAccount = await tx.account.findMany({
         where: {
           credential: {
             identifier: username.trim().toLowerCase(),
@@ -52,25 +56,23 @@ export class OauthService {
         },
       });
 
-      if (existUser) {
+      if (existingAccount[0]) {
         bad_request({ raise: true, msg: 'LOGIN_ALREADY_EXISTS' });
       }
 
-      const userObj: DeepPartial<Account> = {
-        credential: {
-          identifier: username,
-          secret: passwordToHash(password),
+      const insertedAccount = await tx.account.create({
+        data: {
+          isBlocked: false,
+          credential: {
+            create: {
+              identifier: username,
+              secret: passwordToHash(password),
+            },
+          },
         },
-      };
+      });
 
-      const insertedUser = await entityManager
-        .getRepository(Account)
-        .insert(userObj);
-
-      return await this.regenerateRecoveryKeys(
-        entityManager,
-        insertedUser.identifiers[0].id,
-      );
+      return await this.regenerateRecoveryKeys(tx, insertedAccount.id);
     });
   }
 
@@ -104,93 +106,128 @@ export class OauthService {
   }
 
   public async signInByPassword(username: string, password: string) {
-    return await this.dataSource.transaction(async (entityManager) => {
-      const user = await entityManager.getRepository(Account).findOne({
+    return await this.prisma.$transaction(async (tx) => {
+      const account = await tx.account.findMany({
         where: {
           credential: {
             identifier: username.trim().toLowerCase(),
           },
         },
+        include: {
+          credential: true,
+        },
       });
 
-      if (!user || !checkPassword(user.credential.secret, password)) {
+      if (
+        !account[0] ||
+        !checkPassword(account[0].credential.secret, password)
+      ) {
         authorization_failed({ raise: true });
       }
 
-      if (user.is_blocked) {
+      if (account[0].isBlocked) {
         account_blocked({ raise: true });
       }
 
-      return await this.generateJWT(entityManager, user);
+      return await this.generateJWT(account[0]);
     });
   }
 
   public async signInByRefreshToken(refresh_token: string) {
-    return await this.dataSource.transaction(async (entityManager) => {
-      const { current_user, token_type, jti } = this.verifyToken<IRefreshToken>(
-        refresh_token,
-        false,
-      );
+    return await this.prisma.$transaction(async (tx) => {
+      const {
+        current_account: current_account,
+        token_type,
+        jti,
+      } = this.verifyToken<IRefreshToken>(refresh_token, false);
 
       if (!token_type || token_type !== 'refresh') {
         authorization_failed({ raise: true });
       }
 
-      const deleted_token = await entityManager
-        .getRepository(RefreshToken)
-        .delete({ id: jti, account_id: current_user.id });
+      const deleted_token = await tx.refreshToken.deleteMany({
+        where: {
+          id: jti,
+          accountId: current_account.id,
+        },
+      });
 
-      if (!deleted_token.affected) {
+      if (deleted_token.count === 0) {
         authorization_failed({ raise: true });
       }
 
-      const user = await entityManager
-        .getRepository(Account)
-        .findOne({ where: { id: current_user.id } });
+      const account = await tx.account.findUnique({
+        where: {
+          id: current_account.id,
+        },
+        include: {
+          credential: true,
+        },
+      });
 
-      if (!user) {
+      if (!account) {
         authorization_failed({ raise: true });
       }
 
-      if (user.is_blocked) {
+      if (account.isBlocked) {
         account_blocked({ raise: true });
       }
 
-      return await this.generateJWT(entityManager, user);
+      return await this.generateJWT(account);
     });
   }
 
   public async changePassword(recovery_key: string, new_password: string) {
-    return await this.dataSource.transaction(async (entityManager) => {
-      const recovery_key_entity = await entityManager
-        .getRepository(RecoveryKey)
-        .findOne({ where: { id: recovery_key } });
+    return await this.prisma.$transaction(async (tx) => {
+      const recovery_key_entity = await tx.recoveryKey.findUnique({
+        where: {
+          id: recovery_key,
+        },
+      });
 
       if (!recovery_key_entity) {
         authorization_failed({ raise: true });
       }
 
-      await entityManager
-        .getRepository(Account)
-        .update(recovery_key_entity.account_id, {
+      await tx.account.update({
+        where: {
+          id: recovery_key_entity.accountId,
+        },
+        data: {
           credential: {
-            secret: passwordToHash(new_password),
+            update: {
+              secret: passwordToHash(new_password),
+            },
           },
-        });
+        },
+      });
 
-      await entityManager.getRepository(RecoveryKey).delete(recovery_key);
+      await tx.recoveryKey.delete({
+        where: {
+          id: recovery_key,
+        },
+      });
 
       return { message: 'OK' };
     });
   }
 
-  private async generateJWT(entityManager: EntityManager, user: Account) {
-    const refresh = await entityManager
-      .getRepository(RefreshToken)
-      .save({ account_id: user.id });
+  private async generateJWT(
+    account: Account & {
+      credential: Credential;
+    },
+  ) {
+    const refresh = await this.prisma.refreshToken.create({
+      data: {
+        accountId: account.id,
+      },
+      include: {
+        account: true,
+      },
+    });
 
     const access_token = sign(
-      { current_user: user.credential.jsonForJWT(), token_type: 'access' },
+      { current_account: this.jsonForJWT(account), token_type: 'access' },
       this.configService.get('JWT_SECRET_KEY'),
       {
         jwtid: v4(),
@@ -200,7 +237,7 @@ export class OauthService {
     );
 
     const refresh_token = sign(
-      { current_user: { id: user.id }, token_type: 'refresh' },
+      { current_account: { id: account.id }, token_type: 'refresh' },
       this.configService.get('JWT_SECRET_KEY'),
       {
         jwtid: refresh.id,
@@ -228,22 +265,30 @@ export class OauthService {
   }
 
   public async regenerateRecoveryKeys(
-    entityManager: EntityManager,
-    userID: string,
+    prisma: Omit<
+      PrismaService,
+      '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+    >,
+    accountID: string,
   ) {
-    await entityManager
-      .getRepository(RecoveryKey)
-      .delete({ account_id: userID });
+    await prisma.recoveryKey.deleteMany({
+      where: {
+        accountId: accountID,
+      },
+    });
 
-    const keys = [];
+    const output = [];
 
     for (let i = 0; i < 5; i++) {
-      keys.push({ user_id: userID });
+      const insertedValues = await prisma.recoveryKey.create({
+        data: {
+          accountId: accountID,
+        },
+      });
+      output.push(insertedValues);
     }
 
-    return (await entityManager.getRepository(RecoveryKey).save(keys)).map(
-      (recoveryKey: RecoveryKey) => recoveryKey.id,
-    );
+    return output.map((recoveryKey: RecoveryKey) => recoveryKey.id);
   }
 
   public verifyToken<T>(jwt_token: string, is_access_token = true) {
@@ -256,5 +301,18 @@ export class OauthService {
         refresh_token_expired_signature({ raise: true });
       }
     }
+  }
+
+  public jsonForJWT(
+    account: Account & {
+      credential: Credential;
+    },
+  ): IJWTPayload {
+    return {
+      id: account.id,
+      identifier: account.credential.identifier,
+      role: account.role,
+      is_blocked: account.isBlocked,
+    };
   }
 }

@@ -1,8 +1,7 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
 import { NextFunction, Request, Response } from 'express';
-import { IJwtPayload } from 'src/credentials/credential.entity';
 import { verify } from 'jsonwebtoken';
-import { IAccessToken } from './oauth.service';
+import { IAccessToken, IJWTPayload } from './oauth.service';
 import { ConfigService } from '@nestjs/config';
 import {
   account_blocked,
@@ -15,7 +14,7 @@ export class OAuthMiddleware implements NestMiddleware {
   constructor(private configService: ConfigService) {}
 
   public async use(
-    req: Request & { user?: IJwtPayload },
+    req: Request & { account?: IJWTPayload },
     _res: Response,
     next: NextFunction,
   ) {
@@ -24,7 +23,7 @@ export class OAuthMiddleware implements NestMiddleware {
 
     if (jwt_token) {
       try {
-        const { current_user, token_type } = verify(
+        const { current_account: current_account, token_type } = verify(
           jwt_token,
           this.configService.get('JWT_SECRET_KEY'),
         ) as IAccessToken;
@@ -33,12 +32,12 @@ export class OAuthMiddleware implements NestMiddleware {
           return next(authorization_failed({ raise: false }));
         }
 
-        if (current_user) {
-          if (current_user.is_blocked) {
+        if (current_account) {
+          if (current_account.is_blocked) {
             return next(account_blocked({ raise: false }));
           }
 
-          req.user = current_user;
+          req.account = current_account;
 
           return next();
         }

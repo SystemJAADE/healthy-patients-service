@@ -38,3 +38,4 @@ lerna-debug.log*
 /documentation
 .env
 ext/nginx.conf
+.prisma
