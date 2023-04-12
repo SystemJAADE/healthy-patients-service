@@ -20,7 +20,7 @@ import { TriageDto } from './dto/triage.dto';
 @ApiTags('triages')
 @ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(RoleGuard(Role.ADMIN))
+@UseGuards(RoleGuard(Role.ADMIN, Role.DOCTOR))
 export class TriagesController {
   constructor(private readonly triagesService: TriagesService) {}
 
