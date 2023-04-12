@@ -7,13 +7,13 @@ import { IJWTPayload } from 'src/oauth/oauth.service';
  * - Tal vez convertirlo a un enum bitwise para poder tener varios roles a la vez
  */
 
-export const RoleGuard = (role: Role): Type<CanActivate> => {
+export const RoleGuard = (...roles: Role[]): Type<CanActivate> => {
   class RoleGuardMixin implements CanActivate {
     canActivate(context: ExecutionContext) {
       const request = context
         .switchToHttp()
         .getRequest<Request & { account?: IJWTPayload }>();
-      return request.account.role === role;
+      return roles.includes(request.account.role);
     }
   }
   return mixin(RoleGuardMixin);
