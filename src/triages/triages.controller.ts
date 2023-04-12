@@ -13,11 +13,12 @@ import {
 import { TriagesService } from './triages.service';
 import { RoleGuard } from 'src/helpers/role.helper';
 import { Role } from '@prisma/client';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TriageDto } from './dto/triage.dto';
 
 @Controller('triages')
 @ApiTags('triages')
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(RoleGuard(Role.ADMIN))
 export class TriagesController {
