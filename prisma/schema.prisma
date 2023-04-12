@@ -9,21 +9,27 @@ datasource db {
 }
 
 model Account {
-  id               String         @id @default(uuid()) @db.VarChar(36)
-  role             Role           @default(NOT_FULLY_REGISTERED)
-  isBlocked        Boolean        @map("is_blocked") @db.TinyInt()
-  firstSurname     String?        @map("first_surname") @db.VarChar(64)
-  secondSurname    String?        @map("second_surname") @db.VarChar(64)
-  firstName        String?        @map("first_name") @db.VarChar(64)
-  middleName       String?        @map("middle_name") @db.VarChar(64)
-  documentIdentity String?        @map("document_identity") @db.VarChar(32)
-  gender           Gender?
-  cellPhone        String?        @map("cell_phone") @db.VarChar(32)
-  homePhone        String?        @map("home_phone") @db.VarChar(32)
-  credentialId     String?        @unique @map("credential_id") @db.VarChar(36)
-  credential       Credential?    @relation(fields: [credentialId], references: [id])
-  refreshTokens    RefreshToken[]
-  recoveryKeys     RecoveryKey[]
+  // TODO: Zerofill isn't supported by prisma
+  // The field 'medicalRecordNumber' must be of that type and with a limit of 6 digits
+  // See: https://github.com/prisma/prisma/discussions/13988
+  // It's possible to add it modifying manually the migration file
+  id                  String         @id @default(uuid()) @db.VarChar(36)
+  medicalRecordNumber Int            @unique @default(autoincrement()) @map("medical_record_number")
+  role                Role           @default(NOT_FULLY_REGISTERED)
+  isBlocked           Boolean        @map("is_blocked") @db.TinyInt()
+  firstSurname        String?        @map("first_surname") @db.VarChar(64)
+  secondSurname       String?        @map("second_surname") @db.VarChar(64)
+  firstName           String?        @map("first_name") @db.VarChar(64)
+  middleName          String?        @map("middle_name") @db.VarChar(64)
+  documentIdentity    String?        @map("document_identity") @db.VarChar(32)
+  gender              Gender?
+  cellPhone           String?        @map("cell_phone") @db.VarChar(32)
+  homePhone           String?        @map("home_phone") @db.VarChar(32)
+  credentialId        String?        @unique @map("credential_id") @db.VarChar(36)
+  credential          Credential?    @relation(fields: [credentialId], references: [id])
+  refreshTokens       RefreshToken[]
+  recoveryKeys        RecoveryKey[]
+  Triages             Triage[]
 
   @@map("accounts")
 }
@@ -53,6 +59,24 @@ model RecoveryKey {
   @@map("recovery_keys")
 }
 
+model Triage {
+  id                  Int        @id @default(autoincrement())
+  medicalRecordNumber Int        @map("medical_record_number")
+  account             Account?   @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
+  triageType          TriageType @map("triage_type")
+  time                DateTime?  @default(now()) @db.DateTime(0)
+  bloodPressure       String     @map("blood_pressure") @db.VarChar(10)
+  pulse               Int        @db.Int
+  height              Int        @db.Int
+  weight              Int        @db.Int
+  bloodOxygen         Int        @map("blood_oxygen") @db.Int
+  temperature         Int        @db.Int
+  respiratoryRate     Int        @map("respiratory_rate") @db.Int
+  companion           String     @db.VarChar(32)
+
+  @@map("triages")
+}
+
 enum Role {
   NOT_FULLY_REGISTERED @map("not_fully_registered")
   PATIENT              @map("patient")
@@ -68,4 +92,11 @@ enum Gender {
   NEITHER @map("3")
 
   @@map("gender")
+}
+
+enum TriageType {
+  NEW        @map("new")
+  CONTINUOUS @map("continuous")
+
+  @@map("triage_type")
 }
