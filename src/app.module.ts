@@ -7,6 +7,7 @@ import { AccountsModule } from './accounts/accounts.module';
 import { OauthModule } from './oauth/oauth.module';
 import { OAuthMiddleware } from './oauth/oauth.middleware';
 import { RatelimitModule } from './ratelimit/ratelimit.module';
+import { TriagesModule } from './triages/triages.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { RatelimitModule } from './ratelimit/ratelimit.module';
     CredentialsModule,
     AccountsModule,
     OauthModule,
+    TriagesModule,
   ],
   controllers: [],
   providers: [],
