@@ -5,13 +5,14 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { RoleGuard } from 'src/helpers/role.helper';
 import { AccountsService } from './accounts.service';
 
 @Controller('accounts')
 @ApiTags('accounts')
+@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
