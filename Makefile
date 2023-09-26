@@ -12,3 +12,6 @@ run-dev:
 
 run-prod:
 	./bin/start-prod.sh
+
+run-caddy:
+	caddy run --envfile .env --config ext/Caddyfile
