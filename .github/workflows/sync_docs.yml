@@ -29,7 +29,7 @@ jobs:
         with:
           source: ${{ env.REPO_PATH }}
           destination: ${{ env.WIKI_PATH }}
-          branch: main
+          branch: master
           token: ${{ secrets.HEALTHY_REPO_TOKEN }}
           gitAuthorName: ${{ env.GIT_USERNAME }}
           gitAuthorEmail: ${{ env.GIT_EMAIL }}
