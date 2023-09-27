@@ -1,6 +1,7 @@
 name: Sync wiki documentation
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
