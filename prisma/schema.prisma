@@ -65,15 +65,15 @@ model Triage {
   medicalRecordNumber Int        @map("medical_record_number")
   account             Account?   @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
   triageType          TriageType @map("triage_type")
-  time                DateTime?  @default(now()) @db.DateTime(0)
-  bloodPressure       String     @map("blood_pressure") @db.VarChar(10)
-  pulse               Int        @db.Int
-  height              Int        @db.Int
-  weight              Int        @db.Int
-  bloodOxygen         Int        @map("blood_oxygen") @db.Int
-  temperature         Int        @db.Int
-  respiratoryRate     Int        @map("respiratory_rate") @db.Int
-  companion           String     @db.VarChar(32)
+  time                DateTime   @default(now()) @db.DateTime(0)
+  bloodPressure       String?    @map("blood_pressure") @db.VarChar(10)
+  pulse               Int?       @db.Int
+  height              Int?       @db.Int
+  weight              Int?       @db.Int
+  bloodOxygen         Int?       @map("blood_oxygen") @db.Int
+  temperature         Int?       @db.Int
+  respiratoryRate     Int?       @map("respiratory_rate") @db.Int
+  companion           String?    @db.VarChar(32)
 
   @@map("triages")
 }
