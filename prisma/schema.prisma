@@ -14,27 +14,68 @@ model Account {
   // The field 'medicalRecordNumber' must be of that type and with a limit of 6 digits
   // See: https://github.com/prisma/prisma/discussions/13988
   // It's possible to add it modifying manually the migration file
-  id                  String         @id @default(uuid()) @db.VarChar(36)
-  medicalRecordNumber Int            @unique @default(autoincrement()) @map("medical_record_number")
-  role                Role           @default(NOT_FULLY_REGISTERED)
-  isBlocked           Boolean        @map("is_blocked") @db.TinyInt()
-  firstSurname        String?        @map("first_surname") @db.VarChar(64)
-  secondSurname       String?        @map("second_surname") @db.VarChar(64)
-  firstName           String?        @map("first_name") @db.VarChar(64)
-  middleName          String?        @map("middle_name") @db.VarChar(64)
-  documentIdentity    String?        @map("document_identity") @db.VarChar(32)
-  gender              Gender?
-  cellPhone           String?        @map("cell_phone") @db.VarChar(32)
-  homePhone           String?        @map("home_phone") @db.VarChar(32)
-  credentialId        String?        @unique @map("credential_id") @db.VarChar(36)
-  credential          Credential?    @relation(fields: [credentialId], references: [id])
-  refreshTokens       RefreshToken[]
-  recoveryKeys        RecoveryKey[]
-  Triages             Triage[]
-  createdAt           DateTime       @default(now()) @map("created_at")
-  updatedAt           DateTime       @updatedAt @map("updated_at")
+  id                    String                  @id @default(uuid()) @db.VarChar(36)
+  medicalRecordNumber   Int                     @unique @default(autoincrement()) @map("medical_record_number")
+  role                  Role                    @default(NOT_FULLY_REGISTERED)
+  isBlocked             Boolean                 @map("is_blocked") @db.TinyInt()
+  firstSurname          String?                 @map("first_surname") @db.VarChar(64)
+  secondSurname         String?                 @map("second_surname") @db.VarChar(64)
+  firstName             String?                 @map("first_name") @db.VarChar(64)
+  middleName            String?                 @map("middle_name") @db.VarChar(64)
+  documentIdentity      String?                 @map("document_identity") @db.VarChar(32)
+  gender                Gender?
+  cellPhone             String?                 @map("cell_phone") @db.VarChar(32)
+  homePhone             String?                 @map("home_phone") @db.VarChar(32)
+  address               String?                 @db.VarChar(256)
+  ubigeoDepartmentId    Int?                    @map("ubigeo_department_id")
+  ubigeoDepartment      UbigeoDepartment?       @relation(fields: [ubigeoDepartmentId], references: [id])
+  ubigeoProvinceId      Int?                    @map("ubigeo_province_id")
+  ubigeoProvince        UbigeoProvince?         @relation(fields: [ubigeoProvinceId], references: [id])
+  ubigeoDistrictId      Int?                    @map("ubigeo_district_id")
+  ubigeoDistrict        UbigeoDistrict?         @relation(fields: [ubigeoDistrictId], references: [id])
+  credentialId          String?                 @unique @map("credential_id") @db.VarChar(36)
+  credential            Credential?             @relation(fields: [credentialId], references: [id])
+  refreshTokens         RefreshToken[]
+  recoveryKeys          RecoveryKey[]
+  Triages               Triage[]
+  DailyAttendanceRecord DailyAttendanceRecord[]
+  createdAt             DateTime                @default(now()) @map("created_at")
+  updatedAt             DateTime                @updatedAt @map("updated_at")
 
   @@map("accounts")
+}
+
+model UbigeoDepartment {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique @db.VarChar(64)
+  UbigeoProvince UbigeoProvince[]
+  UbigeoDistrict UbigeoDistrict[]
+  Account        Account[]
+
+  @@map("ubigeo_departments")
+}
+
+model UbigeoProvince {
+  id             Int              @id @default(autoincrement())
+  name           String           @unique @db.VarChar(64)
+  departmentId   Int              @map("department_id")
+  department     UbigeoDepartment @relation(fields: [departmentId], references: [id])
+  UbigeoDistrict UbigeoDistrict[]
+  Account        Account[]
+
+  @@map("ubigeo_provinces")
+}
+
+model UbigeoDistrict {
+  id           Int              @id @default(autoincrement())
+  name         String           @unique @db.VarChar(64)
+  provinceId   Int              @map("province_id")
+  province     UbigeoProvince   @relation(fields: [provinceId], references: [id])
+  departmentId Int              @map("department_id")
+  department   UbigeoDepartment @relation(fields: [departmentId], references: [id])
+  Account      Account[]
+
+  @@map("ubigeo_districts")
 }
 
 model Credential {
@@ -63,23 +104,90 @@ model RecoveryKey {
 }
 
 model Triage {
-  id                  Int        @id @default(autoincrement())
-  medicalRecordNumber Int        @map("medical_record_number")
-  account             Account?   @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
-  triageType          TriageType @map("triage_type")
-  time                DateTime   @default(now()) @db.DateTime(0)
-  bloodPressure       String?    @map("blood_pressure") @db.VarChar(10)
-  pulse               Int?       @db.Int
-  height              Int?       @db.Int
-  weight              Int?       @db.Int
-  bloodOxygen         Int?       @map("blood_oxygen") @db.Int
-  temperature         Int?       @db.Int
-  respiratoryRate     Int?       @map("respiratory_rate") @db.Int
-  companion           String?    @db.VarChar(32)
-  createdAt           DateTime   @default(now()) @map("created_at")
-  updatedAt           DateTime   @updatedAt @map("updated_at")
+  id                    Int                     @id @default(autoincrement())
+  medicalRecordNumber   Int                     @map("medical_record_number")
+  account               Account?                @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
+  triageType            TriageType              @map("triage_type")
+  time                  DateTime                @default(now()) @db.DateTime(0)
+  bloodPressure         String?                 @map("blood_pressure") @db.VarChar(10)
+  pulse                 Int?                    @db.Int
+  height                Int?                    @db.Int
+  weight                Int?                    @db.Int
+  bloodOxygen           Int?                    @map("blood_oxygen") @db.Int
+  temperature           Int?                    @db.Int
+  respiratoryRate       Int?                    @map("respiratory_rate") @db.Int
+  companion             String?                 @db.VarChar(32)
+  DailyAttendanceRecord DailyAttendanceRecord[]
+  createdAt             DateTime                @default(now()) @map("created_at")
+  updatedAt             DateTime                @updatedAt @map("updated_at")
 
   @@map("triages")
+}
+
+model DailyAttendanceRecord {
+  id                  Int            @id @default(autoincrement())
+  medicalRecordNumber Int            @map("medical_record_number")
+  patient             Account?       @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
+  triageId            Int            @map("triage_id")
+  triage              Triage?        @relation(fields: [triageId], references: [id], onDelete: Cascade)
+  icd10DiagnosisId    Int            @map("icd10_diagnosis_id")
+  icd10Diagnosis      Icd10Diagnosis @relation(fields: [icd10DiagnosisId], references: [id])
+  datetime            DateTime       @default(now()) @db.DateTime(0)
+  specialtyId         Int            @map("specialty_id")
+  specialty           Specialty      @relation(fields: [specialtyId], references: [id])
+
+  @@map("daily_attendance_records")
+}
+
+model Icd10Category {
+  id          Int          @id @default(autoincrement())
+  code        String       @unique @db.VarChar(8)
+  description String       @db.VarChar(256)
+  chapterId   Int          @map("chapter_id")
+  chapter     Icd10Chapter @relation(fields: [chapterId], references: [id])
+  Icd10Group  Icd10Group[]
+
+  @@map("icd10_categories")
+}
+
+model Icd10Chapter {
+  id            Int             @id @default(autoincrement())
+  code          String          @unique @db.VarChar(8)
+  description   String          @db.VarChar(128)
+  Icd10Category Icd10Category[]
+
+  @@map("icd10_chapters")
+}
+
+model Icd10Group {
+  id             Int              @id @default(autoincrement())
+  code           String           @unique @db.VarChar(8)
+  description    String           @db.VarChar(256)
+  categoryId     Int              @map("category_id")
+  category       Icd10Category    @relation(fields: [categoryId], references: [id])
+  Icd10Diagnosis Icd10Diagnosis[]
+
+  @@map("icd10_groups")
+}
+
+model Icd10Diagnosis {
+  id                    Int                     @id @default(autoincrement())
+  code                  String                  @unique @db.VarChar(8)
+  description           String                  @db.VarChar(256)
+  groupId               Int                     @map("group_id")
+  group                 Icd10Group              @relation(fields: [groupId], references: [id])
+  DailyAttendanceRecord DailyAttendanceRecord[]
+
+  @@map("icd10_diagnoses")
+}
+
+model Specialty {
+  id                    Int                     @id @default(autoincrement())
+  description           String                  @db.VarChar(256)
+  status                Boolean                 @default(true)
+  DailyAttendanceRecord DailyAttendanceRecord[]
+
+  @@map("specialties")
 }
 
 enum Role {
