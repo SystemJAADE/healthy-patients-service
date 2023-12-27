@@ -43,6 +43,7 @@ export class AppModule {
         { path: 'oauth/registration', method: RequestMethod.ALL },
         { path: 'oauth/change_password', method: RequestMethod.ALL },
         { path: 'swagger', method: RequestMethod.ALL },
+        { path: 'api-json', method: RequestMethod.ALL },
       )
       .forRoutes('*');
   }
