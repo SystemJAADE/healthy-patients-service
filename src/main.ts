@@ -21,6 +21,7 @@ async function bootstrap() {
     .setTitle('Healthy patients service')
     .setDescription('TODO Description')
     .setVersion('0.0.1')
+    .setExternalDoc('Postman Collection', '/api-json')
     .addBearerAuth()
     .build();
 
