@@ -9,6 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "migrate": "npx prisma migrate dev --skip-generate",
+    "seed": "npx prisma db seed",
     "prebuild": "rimraf dist",
     "prepare": "husky install",
     "start": "nest start",
@@ -97,6 +98,7 @@
     "testEnvironment": "node"
   },
   "prisma": {
-    "schema": "prisma/schema.prisma"
+    "schema": "prisma/schema.prisma",
+    "seed": "ts-node prisma/seed.ts"
   }
 }

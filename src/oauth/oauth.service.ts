@@ -16,6 +16,8 @@ import {
 } from 'src/errors';
 import { Account, Credential, RecoveryKey, Role } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { RegistrationDto } from './dto/registration.dto';
+
 export interface IJWTToken {
   iat: number;
   exp: number;
@@ -46,12 +48,12 @@ export class OauthService {
     private prisma: PrismaService,
   ) {}
 
-  public async registration(username: string, password: string) {
+  public async registration(account: RegistrationDto) {
     return await this.prisma.$transaction(async (tx) => {
       const existingAccount = await tx.account.findMany({
         where: {
           credential: {
-            identifier: username.trim().toLowerCase(),
+            identifier: account.username.trim().toLowerCase(),
           },
         },
       });
@@ -63,10 +65,34 @@ export class OauthService {
       const insertedAccount = await tx.account.create({
         data: {
           isBlocked: false,
+          firstSurname: account.firstSurname,
+          secondSurname: account.secondSurname,
+          firstName: account.firstName,
+          middleName: account.middleName,
+          documentIdentity: account.documentIdentity,
+          gender: account.gender,
+          cellPhone: account.cellPhone,
+          homePhone: account.homePhone,
+          address: account.address,
+          ubigeoDepartment: {
+            connect: {
+              id: account.ubigeoDepartmentId,
+            },
+          },
+          ubigeoDistrict: {
+            connect: {
+              id: account.ubigeoDistrictId,
+            },
+          },
+          ubigeoProvince: {
+            connect: {
+              id: account.ubigeoProvinceId,
+            },
+          },
           credential: {
             create: {
-              identifier: username,
-              secret: passwordToHash(password),
+              identifier: account.username,
+              secret: passwordToHash(account.password),
             },
           },
         },
