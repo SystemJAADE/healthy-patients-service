@@ -27,11 +27,11 @@ model Account {
   cellPhone             String?                 @map("cell_phone") @db.VarChar(32)
   homePhone             String?                 @map("home_phone") @db.VarChar(32)
   address               String?                 @db.VarChar(256)
-  ubigeoDepartmentId    Int?                    @map("ubigeo_department_id")
+  ubigeoDepartmentId    String?                 @map("ubigeo_department_id")
   ubigeoDepartment      UbigeoDepartment?       @relation(fields: [ubigeoDepartmentId], references: [id])
-  ubigeoProvinceId      Int?                    @map("ubigeo_province_id")
+  ubigeoProvinceId      String?                 @map("ubigeo_province_id")
   ubigeoProvince        UbigeoProvince?         @relation(fields: [ubigeoProvinceId], references: [id])
-  ubigeoDistrictId      Int?                    @map("ubigeo_district_id")
+  ubigeoDistrictId      String?                 @map("ubigeo_district_id")
   ubigeoDistrict        UbigeoDistrict?         @relation(fields: [ubigeoDistrictId], references: [id])
   credentialId          String?                 @unique @map("credential_id") @db.VarChar(36)
   credential            Credential?             @relation(fields: [credentialId], references: [id])
@@ -46,7 +46,7 @@ model Account {
 }
 
 model UbigeoDepartment {
-  id             Int              @id @default(autoincrement())
+  id             String           @id
   name           String           @unique @db.VarChar(64)
   UbigeoProvince UbigeoProvince[]
   UbigeoDistrict UbigeoDistrict[]
@@ -56,9 +56,9 @@ model UbigeoDepartment {
 }
 
 model UbigeoProvince {
-  id             Int              @id @default(autoincrement())
-  name           String           @unique @db.VarChar(64)
-  departmentId   Int              @map("department_id")
+  id             String           @id
+  name           String           @db.VarChar(64)
+  departmentId   String           @map("department_id")
   department     UbigeoDepartment @relation(fields: [departmentId], references: [id])
   UbigeoDistrict UbigeoDistrict[]
   Account        Account[]
@@ -67,11 +67,11 @@ model UbigeoProvince {
 }
 
 model UbigeoDistrict {
-  id           Int              @id @default(autoincrement())
-  name         String           @unique @db.VarChar(64)
-  provinceId   Int              @map("province_id")
+  id           String           @id
+  name         String           @db.VarChar(64)
+  provinceId   String           @map("province_id")
   province     UbigeoProvince   @relation(fields: [provinceId], references: [id])
-  departmentId Int              @map("department_id")
+  departmentId String           @map("department_id")
   department   UbigeoDepartment @relation(fields: [departmentId], references: [id])
   Account      Account[]
 
