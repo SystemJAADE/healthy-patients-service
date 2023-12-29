@@ -34,7 +34,7 @@ export class OauthController {
   })
   @Post('registration')
   public async registration(@Body() body: RegistrationDto) {
-    return await this.oauthService.registration(body.username, body.password);
+    return await this.oauthService.registration(body);
   }
 
   @ApiOperation({
