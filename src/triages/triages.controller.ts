@@ -11,7 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { TriagesService } from './triages.service';
-import { RoleGuard } from 'src/helpers/role.helper';
+import { RoleGuard } from '../helpers/role.helper';
 import { Role } from '@prisma/client';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TriageDto } from './dto/triage.dto';
