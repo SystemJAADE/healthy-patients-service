@@ -114,7 +114,7 @@ model Triage {
   height                Int?                    @db.Int
   weight                Int?                    @db.Int
   bloodOxygen           Int?                    @map("blood_oxygen") @db.Int
-  temperature           Decimal                 @db.Decimal(3,1)
+  temperature           Float                   @db.Float()
   respiratoryRate       Int?                    @map("respiratory_rate") @db.Int
   DailyAttendanceRecord DailyAttendanceRecord[]
   createdAt             DateTime                @default(now()) @map("created_at")
