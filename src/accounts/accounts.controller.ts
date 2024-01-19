@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
-import { RoleGuard } from 'src/helpers/role.helper';
+import { RoleGuard } from '../helpers/role.helper';
 import { AccountsService } from './accounts.service';
 
 @Controller('accounts')

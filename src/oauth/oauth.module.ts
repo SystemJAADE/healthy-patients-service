@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { OauthController } from './oauth.controller';
 import { OauthService } from './oauth.service';
-import { CredentialsModule } from 'src/credentials/credentials.module';
+import { CredentialsModule } from '../credentials/credentials.module';
 import { ConfigModule } from '@nestjs/config';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Module({
   imports: [CredentialsModule, ConfigModule],

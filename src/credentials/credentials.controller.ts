@@ -6,7 +6,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { RoleGuard } from 'src/helpers/role.helper';
+import { RoleGuard } from '../helpers/role.helper';
 import { CredentialsService } from './credentials.service';
 import { Role } from '@prisma/client';
 

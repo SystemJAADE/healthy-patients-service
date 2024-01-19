@@ -1,10 +1,10 @@
 import { Injectable, Req } from '@nestjs/common';
-import { checkPassword, passwordToHash } from 'src/helpers/password.helper';
+import { checkPassword, passwordToHash } from '../helpers/password.helper';
 import { Algorithm, sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
 import { Request } from 'express';
-import { validateDTO } from 'src/helpers/validate.helper';
+import { validateDTO } from '../helpers/validate.helper';
 import { SignInByPasswordDto } from './dto/sign-in-by-password.dto';
 import { SignInByRefreshTokenDto } from './dto/sign-in-by-refresh-token.dto';
 import {
@@ -13,9 +13,9 @@ import {
   authorization_failed,
   bad_request,
   refresh_token_expired_signature,
-} from 'src/errors';
+} from '../errors';
 import { Account, Credential, RecoveryKey, Role } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { RegistrationDto } from './dto/registration.dto';
 
 export interface IJWTToken {

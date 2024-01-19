@@ -10,11 +10,11 @@ import {
 } from '@nestjs/swagger';
 import { Request } from 'express';
 import { SignInResponseDto } from './dto/sign-in-response.dto';
-import { validateDTO } from 'src/helpers/validate.helper';
+import { validateDTO } from '../helpers/validate.helper';
 import { SignInByPasswordDto } from './dto/sign-in-by-password.dto';
 import { SignInByRefreshTokenDto } from './dto/sign-in-by-refresh-token.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
-import { authorization_failed } from 'src/errors';
+import { authorization_failed } from '../errors';
 
 @ApiTags('oauth')
 @Controller('oauth')
