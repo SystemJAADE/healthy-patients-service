@@ -1,6 +1,6 @@
 import { ClassConstructor, plainToClass } from 'class-transformer';
 import { validateSync, ValidationError } from 'class-validator';
-import { bad_request } from 'src/errors';
+import { bad_request } from '../errors';
 
 export function validateDTO(
   type: ClassConstructor<unknown>,

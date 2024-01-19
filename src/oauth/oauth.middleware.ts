@@ -20,7 +20,7 @@ export class OAuthMiddleware implements NestMiddleware {
   ) {
     const jwt_token: string = req.headers.authorization
       ? req.headers.authorization.replace('Bearer ', '')
-      : '' || (req.cookies as { JWT: string }).JWT;
+      : '' || (req.cookies as { JWT?: string })?.JWT;
 
     if (jwt_token) {
       try {
