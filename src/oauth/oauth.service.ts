@@ -3,10 +3,7 @@ import { checkPassword, passwordToHash } from '../helpers/password.helper';
 import { Algorithm, sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
 import { v4 } from 'uuid';
-import { Request } from 'express';
 import { validateDTO } from '../helpers/validate.helper';
-import { SignInByPasswordDto } from './dto/sign-in-by-password.dto';
-import { SignInByRefreshTokenDto } from './dto/sign-in-by-refresh-token.dto';
 import {
   access_token_expired_signature,
   account_blocked,
@@ -17,6 +14,7 @@ import {
 import { Account, Credential, RecoveryKey, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegistrationDto } from './dto/registration.dto';
+import { SignInDto } from './dto/sign-in.dto';
 
 export interface IJWTToken {
   iat: number;
@@ -102,33 +100,20 @@ export class OauthService {
     });
   }
 
-  public async token(@Req() req: Request) {
-    if (Object.keys(req.query).length) {
-      switch (req.query.grand_type) {
-        case 'password':
-          const signInByPasswordDto = {
-            login: req.query.username as string,
-            password: req.query.password as string,
-          };
+  public async token(signInDto: SignInDto) {
+    validateDTO(SignInDto, signInDto);
 
-          validateDTO(SignInByPasswordDto, signInByPasswordDto);
-
-          return await this.signInByPassword(
-            signInByPasswordDto.login,
-            signInByPasswordDto.password,
-          );
-        case 'refresh_token':
-          const signInByRefreshTokenDto = {
-            refresh_token: req.query.refresh_token as string,
-          };
-
-          validateDTO(SignInByRefreshTokenDto, signInByRefreshTokenDto);
-
-          return await this.signInByRefreshToken(
-            signInByRefreshTokenDto.refresh_token,
-          );
-      }
+    switch (signInDto.grand_type) {
+      case 'password':
+        return await this.signInByPassword(
+          signInDto.username,
+          signInDto.password,
+        );
+      case 'refresh_token':
+        return await this.signInByRefreshToken(signInDto.refresh_token);
     }
+
+    authorization_failed({ raise: true });
   }
 
   public async signInByPassword(username: string, password: string) {
