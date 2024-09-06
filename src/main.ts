@@ -9,6 +9,17 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
   });
+  const configService = app.get(ConfigService);
+
+  const corsOrigins = configService.get('CORS_ORIGINS');
+
+  if (corsOrigins) {
+    app.enableCors({
+      origin: corsOrigins.split(','),
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+      credentials: true,
+    });
+  }
 
   app.use(cookieParser());
   app.useGlobalPipes(
@@ -28,7 +39,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api', app, document);
 
-  const configService = app.get(ConfigService);
   const host = configService.get('APP_HOST') ?? 'localhost';
   const port = configService.get('APP_PORT') ?? 3000;
 
