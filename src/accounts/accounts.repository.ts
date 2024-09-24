@@ -13,21 +13,34 @@ export class AccountsRepository {
   async getAccountByCredentialIdentifier(
     identifier: string,
   ): Promise<Omit<Account, 'roleId' | 'subroleId'> | null> {
-    return this.prisma.account.findFirst({
+    const account = await this.prisma.account.findFirst({
       where: {
         credential: {
           identifier: identifier,
         },
       },
-      omit: {
-        roleId: true,
-        subroleId: true,
-      },
       include: {
-        role: true,
-        subrole: true,
+        permission: {
+          include: {
+            role: {
+              include: {
+                subroles: true,
+              },
+            },
+          },
+        },
       },
     });
+
+    if (account && account.permission) {
+      account.permission.forEach((perm) => {
+        perm.role.subroles = perm.role.subroles.filter(
+          (subrole) => subrole.id === perm.subroleId,
+        );
+      });
+    }
+
+    return account;
   }
 
   async getAccounts(params: {

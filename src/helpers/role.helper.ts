@@ -30,14 +30,25 @@ export const RoleGuard = (): Type<CanActivate> => {
       const requiredRoles =
         this.reflector.get<string[]>(ROLES_KEY, context.getHandler()) ||
         this.reflector.get<string[]>(ROLES_KEY, context.getClass());
-      const hasRole = requiredRoles.some((role) => role === account.role.name);
+
+      const hasRole = requiredRoles
+        ? requiredRoles.some((role) =>
+            account.permissions.some(
+              (permission) => permission.role.name === role,
+            ),
+          )
+        : true;
 
       const requiredSubroles =
         this.reflector.get<string[]>(SUBROLES_KEY, context.getHandler()) ||
         this.reflector.get<string[]>(SUBROLES_KEY, context.getClass());
 
       const hasSubrole = requiredSubroles
-        ? requiredSubroles.some((subrole) => subrole === account.subrole.name)
+        ? requiredSubroles.some((subrole) =>
+            account.permissions.some((permission) =>
+              permission.subroles.some((sub) => sub.name === subrole),
+            ),
+          )
         : true;
 
       return hasRole && hasSubrole;

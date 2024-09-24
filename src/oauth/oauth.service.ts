@@ -32,8 +32,10 @@ export interface IJWTToken {
 export interface IJWTPayload {
   id: string;
   identifier: string;
-  role: Role;
-  subrole?: Subrole;
+  permissions: {
+    role: Role;
+    subroles: Subrole[];
+  }[];
   is_blocked: boolean;
 }
 
@@ -101,18 +103,20 @@ export class OauthService {
               secret: passwordToHash(account.password),
             },
           },
-          role: {
-            connect: {
-              id: account.roleId,
-            },
-          },
-          subrole: {
-            connect: {
-              id: account.subroleId,
-            },
-          },
         },
       });
+
+      if (account.roleIds && account.subroleIds) {
+        const permissionsData = account.roleIds.map((roleId, index) => ({
+          accountId: insertedAccount.id,
+          roleId: roleId,
+          subroleId: account.subroleIds[index],
+        }));
+
+        await tx.permission.createMany({
+          data: permissionsData,
+        });
+      }
 
       return await this.regenerateRecoveryKeys(tx, insertedAccount.id);
     });
@@ -144,8 +148,15 @@ export class OauthService {
         },
         include: {
           credential: true,
-          role: true,
-          subrole: true,
+          permission: {
+            include: {
+              role: {
+                include: {
+                  subroles: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -193,8 +204,15 @@ export class OauthService {
         },
         include: {
           credential: true,
-          role: true,
-          subrole: true,
+          permission: {
+            include: {
+              role: {
+                include: {
+                  subroles: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -248,8 +266,11 @@ export class OauthService {
   private async generateJWT(
     account: Account & {
       credential: Credential;
-      role: Role;
-      subrole: Subrole;
+      permission: {
+        role: Role & {
+          subroles: Subrole[];
+        };
+      }[];
     },
   ) {
     const refresh = await this.prisma.refreshToken.create({
@@ -341,15 +362,20 @@ export class OauthService {
   public jsonForJWT(
     account: Account & {
       credential: Credential;
-      role: Role;
-      subrole: Subrole;
+      permission: {
+        role: Role & {
+          subroles: Subrole[];
+        };
+      }[];
     },
   ): IJWTPayload {
     return {
       id: account.id,
       identifier: account.credential.identifier,
-      role: account.role,
-      subrole: account.subrole,
+      permissions: account.permission.map((permission) => ({
+        role: permission.role,
+        subroles: permission.role.subroles,
+      })),
       is_blocked: account.isBlocked,
     };
   }

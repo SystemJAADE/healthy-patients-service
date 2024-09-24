@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '@prisma/client';
 import {
+  IsArray,
   IsEnum,
   IsNotEmpty,
   IsOptional,
@@ -130,16 +131,19 @@ export class RegistrationDto {
 
   @ApiProperty({
     required: true,
-    description: 'Rol',
-    example: 1,
+    description: 'IDs de Roles',
+    example: [1],
   })
-  roleId: number;
+  @IsArray()
+  @IsNotEmpty()
+  roleIds: number[];
 
   @ApiProperty({
     required: true,
-    description: 'Subrol',
-    example: 1,
+    description: 'IDs de Subroles',
+    example: [1],
   })
+  @IsArray()
   @IsOptional()
-  subroleId?: number;
+  subroleIds?: number[];
 }
