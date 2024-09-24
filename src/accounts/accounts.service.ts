@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountsRepository } from './accounts.repository';
 import { Account } from '@prisma/client';
+import { AccountDto } from './dto/account.dto';
 
 @Injectable()
 export class AccountsService {
@@ -28,5 +29,12 @@ export class AccountsService {
 
   public async findAll(): Promise<Account[]> {
     return this.repository.getAccounts({});
+  }
+
+  public async update(id: string, data: AccountDto): Promise<Account> {
+    return await this.repository.updateAccount({
+      data,
+      where: { id },
+    });
   }
 }
