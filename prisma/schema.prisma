@@ -17,10 +17,7 @@ model Account {
   // It's possible to add it modifying manually the migration file
   id                    String                  @id @default(uuid()) @db.VarChar(36)
   medicalRecordNumber   Int                     @unique @default(autoincrement()) @map("medical_record_number")
-  roleId                Int                     @map("role_id")
-  role                  Role                    @relation(fields: [roleId], references: [id])
-  subroleId             Int?                    @map("subrole_id")
-  subrole               Subrole?                @relation(fields: [subroleId], references: [id])
+  permission            Permission[]
   isBlocked             Boolean                 @map("is_blocked") @db.TinyInt()
   firstSurname          String?                 @map("first_surname") @db.VarChar(64)
   secondSurname         String?                 @map("second_surname") @db.VarChar(64)
@@ -194,22 +191,35 @@ model Specialty {
 }
 
 model Role {
-  id       Int       @id @default(autoincrement())
-  name     String    @unique
-  subroles Subrole[]
-  Account  Account[]
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  subroles    Subrole[]
+  permissions Permission[]
 
   @@map("roles")
 }
 
 model Subrole {
-  id      Int       @id @default(autoincrement())
-  name    String    @unique
-  roleId  Int
-  role    Role      @relation(fields: [roleId], references: [id])
-  Account Account[]
+  id          Int          @id @default(autoincrement())
+  name        String       @unique
+  roleId      Int
+  role        Role         @relation(fields: [roleId], references: [id])
+  permissions Permission[]
 
   @@map("subroles")
+}
+
+model Permission {
+  id        Int      @id @default(autoincrement())
+  accountId String   @map("account_id")
+  roleId    Int?     @map("role_id")
+  subroleId Int?     @map("subrole_id")
+  account   Account  @relation(fields: [accountId], references: [id])
+  role      Role?    @relation(fields: [roleId], references: [id])
+  subrole   Subrole? @relation(fields: [subroleId], references: [id])
+
+  @@unique([accountId, roleId, subroleId])
+  @@map("permissions")
 }
 
 enum Gender {
