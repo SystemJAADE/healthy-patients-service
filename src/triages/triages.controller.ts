@@ -10,14 +10,11 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { TriagesService } from './triages.service';
 import { RoleGuard, Roles } from '../helpers/role.helper';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TriageDto } from './dto/triage.dto';
+import { TriagesService } from './triages.service';
 
 @Controller('triages')
-@ApiTags('triages')
-@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(RoleGuard())
 @Roles('Admin', 'Doctor')

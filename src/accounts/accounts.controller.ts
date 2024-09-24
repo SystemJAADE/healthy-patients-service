@@ -6,13 +6,10 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RoleGuard, Roles } from '../helpers/role.helper';
 import { AccountsService } from './accounts.service';
 
 @Controller('accounts')
-@ApiTags('accounts')
-@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 @Roles('Admin', 'Doctor')
 @UseGuards(RoleGuard())
