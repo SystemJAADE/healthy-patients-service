@@ -1,6 +1,7 @@
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["windows", "debian-openssl-1.0.x", "debian-openssl-1.1.x"]
+  provider        = "prisma-client-js"
+  previewFeatures = ["omitApi"]
+  binaryTargets   = ["windows", "debian-openssl-1.0.x", "debian-openssl-1.1.x", "debian-openssl-3.0.x"]
 }
 
 datasource db {
@@ -16,7 +17,10 @@ model Account {
   // It's possible to add it modifying manually the migration file
   id                    String                  @id @default(uuid()) @db.VarChar(36)
   medicalRecordNumber   Int                     @unique @default(autoincrement()) @map("medical_record_number")
-  role                  Role                    @default(NOT_FULLY_REGISTERED)
+  roleId                Int                     @map("role_id")
+  role                  Role                    @relation(fields: [roleId], references: [id])
+  subroleId             Int?                    @map("subrole_id")
+  subrole               Subrole?                @relation(fields: [subroleId], references: [id])
   isBlocked             Boolean                 @map("is_blocked") @db.TinyInt()
   firstSurname          String?                 @map("first_surname") @db.VarChar(64)
   secondSurname         String?                 @map("second_surname") @db.VarChar(64)
@@ -189,13 +193,23 @@ model Specialty {
   @@map("specialties")
 }
 
-enum Role {
-  NOT_FULLY_REGISTERED @map("not_fully_registered")
-  PATIENT              @map("patient")
-  DOCTOR               @map("doctor")
-  ADMIN                @map("admin")
+model Role {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  subroles Subrole[]
+  Account  Account[]
 
-  @@map("role")
+  @@map("roles")
+}
+
+model Subrole {
+  id      Int       @id @default(autoincrement())
+  name    String    @unique
+  roleId  Int
+  role    Role      @relation(fields: [roleId], references: [id])
+  Account Account[]
+
+  @@map("subroles")
 }
 
 enum Gender {

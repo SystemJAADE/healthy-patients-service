@@ -11,8 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { TriagesService } from './triages.service';
-import { RoleGuard } from '../helpers/role.helper';
-import { Role } from '@prisma/client';
+import { RoleGuard, Roles } from '../helpers/role.helper';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { TriageDto } from './dto/triage.dto';
 
@@ -20,7 +19,8 @@ import { TriageDto } from './dto/triage.dto';
 @ApiTags('triages')
 @ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
-@UseGuards(RoleGuard(Role.ADMIN, Role.DOCTOR))
+@UseGuards(RoleGuard())
+@Roles('Admin', 'Doctor')
 export class TriagesController {
   constructor(private readonly triagesService: TriagesService) {}
 

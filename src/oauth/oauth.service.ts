@@ -1,4 +1,4 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { checkPassword, passwordToHash } from '../helpers/password.helper';
 import { Algorithm, sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
@@ -11,7 +11,14 @@ import {
   bad_request,
   refresh_token_expired_signature,
 } from '../errors';
-import { Account, Credential, RecoveryKey, Role } from '@prisma/client';
+import {
+  Account,
+  Credential,
+  PrismaClient,
+  RecoveryKey,
+  Role,
+  Subrole,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegistrationDto } from './dto/registration.dto';
 import { SignInDto } from './dto/sign-in.dto';
@@ -26,6 +33,7 @@ export interface IJWTPayload {
   id: string;
   identifier: string;
   role: Role;
+  subrole?: Subrole;
   is_blocked: boolean;
 }
 
@@ -93,6 +101,16 @@ export class OauthService {
               secret: passwordToHash(account.password),
             },
           },
+          role: {
+            connect: {
+              id: account.roleId,
+            },
+          },
+          subrole: {
+            connect: {
+              id: account.subroleId,
+            },
+          },
         },
       });
 
@@ -126,6 +144,8 @@ export class OauthService {
         },
         include: {
           credential: true,
+          role: true,
+          subrole: true,
         },
       });
 
@@ -173,6 +193,8 @@ export class OauthService {
         },
         include: {
           credential: true,
+          role: true,
+          subrole: true,
         },
       });
 
@@ -226,6 +248,8 @@ export class OauthService {
   private async generateJWT(
     account: Account & {
       credential: Credential;
+      role: Role;
+      subrole: Subrole;
     },
   ) {
     const refresh = await this.prisma.refreshToken.create({
@@ -277,8 +301,8 @@ export class OauthService {
 
   public async regenerateRecoveryKeys(
     prisma: Omit<
-      PrismaService,
-      '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+      PrismaClient,
+      '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
     >,
     accountID: string,
   ) {
@@ -317,12 +341,15 @@ export class OauthService {
   public jsonForJWT(
     account: Account & {
       credential: Credential;
+      role: Role;
+      subrole: Subrole;
     },
   ): IJWTPayload {
     return {
       id: account.id,
       identifier: account.credential.identifier,
       role: account.role,
+      subrole: account.subrole,
       is_blocked: account.isBlocked,
     };
   }

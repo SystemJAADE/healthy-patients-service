@@ -1,6 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '@prisma/client';
-import { IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  Length,
+} from 'class-validator';
 
 export class RegistrationDto {
   @ApiProperty({
@@ -121,4 +127,19 @@ export class RegistrationDto {
     example: '0101',
   })
   ubigeoProvinceId: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Rol',
+    example: 1,
+  })
+  roleId: number;
+
+  @ApiProperty({
+    required: true,
+    description: 'Subrol',
+    example: 1,
+  })
+  @IsOptional()
+  subroleId?: number;
 }

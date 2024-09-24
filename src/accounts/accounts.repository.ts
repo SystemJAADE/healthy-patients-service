@@ -10,6 +10,26 @@ export class AccountsRepository {
     return this.prisma.account.findUnique({ where });
   }
 
+  async getAccountByCredentialIdentifier(
+    identifier: string,
+  ): Promise<Omit<Account, 'roleId' | 'subroleId'> | null> {
+    return this.prisma.account.findFirst({
+      where: {
+        credential: {
+          identifier: identifier,
+        },
+      },
+      omit: {
+        roleId: true,
+        subroleId: true,
+      },
+      include: {
+        role: true,
+        subrole: true,
+      },
+    });
+  }
+
   async getAccounts(params: {
     skip?: number;
     take?: number;
