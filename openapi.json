@@ -1,0 +1,593 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/credentials": {
+      "get": {
+        "operationId": "CredentialsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["credentials"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/accounts": {
+      "get": {
+        "operationId": "AccountsController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["accounts"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/accounts/{username}": {
+      "get": {
+        "operationId": "AccountsController_findByUsername",
+        "parameters": [
+          {
+            "name": "username",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        },
+        "tags": ["accounts"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/oauth/registration": {
+      "post": {
+        "operationId": "OauthController_registration",
+        "summary": "Registro de usuario",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": ["oauth"]
+      }
+    },
+    "/oauth/token": {
+      "post": {
+        "operationId": "OauthController_token",
+        "summary": "Autorización de usuario",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignInResponseDto"
+                }
+              }
+            }
+          },
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["oauth"]
+      }
+    },
+    "/oauth/change_password": {
+      "post": {
+        "operationId": "OauthController_changePassword",
+        "summary": "Recuperación de contraseña",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["oauth"]
+      }
+    },
+    "/triages": {
+      "get": {
+        "operationId": "TriagesController_findAll",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["triages"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "operationId": "TriagesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": ["triages"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/triages/{id}": {
+      "get": {
+        "operationId": "TriagesController_findByID",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["triages"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "operationId": "TriagesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TriageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["triages"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "operationId": "TriagesController_delete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["triages"],
+        "security": [
+          {
+            "bearer": []
+          }
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Healthy patients service",
+    "description": "Microservicio para el sistema Healthy",
+    "version": "0.0.1",
+    "contact": {}
+  },
+  "tags": ["credentials", "accounts", "oauth", "triages"],
+  "servers": [],
+  "externalDocs": {
+    "description": "Postman Collection",
+    "url": "/api-json"
+  },
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RegistrationDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 32,
+            "description": "Nombre de usuario",
+            "example": "usuario"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 32,
+            "description": "Contraseña",
+            "example": "clave123"
+          },
+          "firstSurname": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 64,
+            "description": "Primer apellido",
+            "example": "Perez"
+          },
+          "secondSurname": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 64,
+            "description": "Segundo apellido",
+            "example": "Perez"
+          },
+          "firstName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 64,
+            "description": "Primer nombre",
+            "example": "Sanchez"
+          },
+          "middleName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 64,
+            "description": "Segundo nombre",
+            "example": "Diego"
+          },
+          "documentIdentity": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 32,
+            "description": "Documento de identidad",
+            "example": "12345678"
+          },
+          "gender": {
+            "type": "object",
+            "description": "Género",
+            "example": "MALE"
+          },
+          "cellPhone": {
+            "type": "string",
+            "minLength": 9,
+            "description": "Celular",
+            "example": "987654321"
+          },
+          "homePhone": {
+            "type": "string",
+            "minLength": 7,
+            "description": "Teléfono fijo",
+            "example": "5432100"
+          },
+          "address": {
+            "type": "string",
+            "description": "Dirección",
+            "example": "Av. Los Alamos #123"
+          },
+          "ubigeoDepartmentId": {
+            "type": "string",
+            "description": "Departamento",
+            "example": "01"
+          },
+          "ubigeoProvinceId": {
+            "type": "string",
+            "description": "Provincia",
+            "example": "0101"
+          },
+          "ubigeoDistrictId": {
+            "type": "string",
+            "description": "Distrito",
+            "example": "010101"
+          },
+          "roleIds": {
+            "description": "IDs de Roles",
+            "example": [1],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "subroleIds": {
+            "description": "IDs de Subroles",
+            "example": [1],
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "firstSurname",
+          "secondSurname",
+          "firstName",
+          "documentIdentity",
+          "gender",
+          "homePhone",
+          "address",
+          "ubigeoDepartmentId",
+          "ubigeoProvinceId",
+          "ubigeoDistrictId",
+          "roleIds",
+          "subroleIds"
+        ]
+      },
+      "SignInDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 32,
+            "description": "Nombre de usuario, solo si grand_type = password",
+            "example": "usuario"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 32,
+            "description": "Contraseña, solo si grand_type = password",
+            "example": "clave123"
+          },
+          "grand_type": {
+            "type": "string",
+            "description": "Tipo de concesión (Grand type)",
+            "enum": ["password", "refresh_token"],
+            "example": "password"
+          },
+          "refresh_token": {
+            "type": "string",
+            "nullable": true,
+            "description": "Refresh token, solo si grand_type = refresh_token",
+            "example": ""
+          }
+        },
+        "required": ["username", "password", "grand_type"]
+      },
+      "SignInResponseDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT token"
+          },
+          "token_type": {
+            "type": "string",
+            "description": "Tipo de token"
+          },
+          "token_expires_at": {
+            "type": "string",
+            "description": "JWT Token que expira en (DateTime)"
+          },
+          "refresh_token": {
+            "type": "string",
+            "description": "Refresh token"
+          },
+          "refresh_token_expires_at": {
+            "type": "string",
+            "description": "Refresh Token que expira en (DateTime)"
+          }
+        },
+        "required": [
+          "token",
+          "token_type",
+          "token_expires_at",
+          "refresh_token",
+          "refresh_token_expires_at"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "recovery_key": {
+            "type": "string",
+            "description": "Código de cambio de contraseña de un solo uso"
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 32,
+            "description": "Nueva contraseña"
+          }
+        },
+        "required": ["recovery_key", "new_password"]
+      },
+      "TriageDto": {
+        "type": "object",
+        "properties": {
+          "triageType": {
+            "type": "object",
+            "description": "Tipo de triaje",
+            "example": "NEW"
+          },
+          "medicalRecordNumber": {
+            "type": "number",
+            "description": "Número de historia clínica",
+            "example": 1
+          },
+          "time": {
+            "type": "object",
+            "description": "Fecha y hora de atención",
+            "example": "2021-01-01T00:00:00.000Z"
+          },
+          "bloodPressure": {
+            "type": "string",
+            "pattern": "/^\\d{1,3}\\/\\d{1,3}$/",
+            "description": "Presión arterial",
+            "example": "120/80"
+          },
+          "pulse": {
+            "type": "number",
+            "description": "Pulso",
+            "example": 80
+          },
+          "height": {
+            "type": "number",
+            "description": "Estatura (cm)",
+            "example": 170
+          },
+          "weight": {
+            "type": "number",
+            "description": "Peso (kg)",
+            "example": 70
+          },
+          "bloodOxygen": {
+            "type": "number",
+            "description": "Oxígeno en la sangre",
+            "example": 95
+          },
+          "temperature": {
+            "type": "number",
+            "description": "Temperatura (°C)",
+            "example": 36.5
+          },
+          "respiratoryRate": {
+            "type": "number",
+            "description": "Frecuencia respiratoria",
+            "example": 15
+          }
+        },
+        "required": [
+          "triageType",
+          "medicalRecordNumber",
+          "bloodPressure",
+          "pulse",
+          "height",
+          "weight",
+          "bloodOxygen",
+          "temperature",
+          "respiratoryRate"
+        ]
+      }
+    }
+  }
+}
