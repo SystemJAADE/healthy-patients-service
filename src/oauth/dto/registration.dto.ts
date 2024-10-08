@@ -117,17 +117,17 @@ export class RegistrationDto {
 
   @ApiProperty({
     required: true,
-    description: 'Distrito',
-    example: '010101',
-  })
-  ubigeoDistrictId: string;
-
-  @ApiProperty({
-    required: true,
     description: 'Provincia',
     example: '0101',
   })
   ubigeoProvinceId: string;
+
+  @ApiProperty({
+    required: true,
+    description: 'Distrito',
+    example: '010101',
+  })
+  ubigeoDistrictId: string;
 
   @ApiProperty({
     required: true,
