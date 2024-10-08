@@ -9,23 +9,13 @@ import {
   Length,
 } from 'class-validator';
 
-export class RegistrationDto {
+export class AccountDto {
   @ApiProperty({
     required: true,
-    description: 'Nombre de usuario',
-    example: 'usuario',
+    description: 'Estado de bloqueo',
+    example: false,
   })
-  @IsString()
-  @Length(4, 32)
-  username: string;
-
-  @ApiProperty({
-    required: true,
-    description: 'Contraseña',
-    example: 'clave123',
-  })
-  @Length(4, 32)
-  password: string;
+  isBlocked: boolean;
 
   @ApiProperty({
     required: true,
@@ -117,6 +107,13 @@ export class RegistrationDto {
 
   @ApiProperty({
     required: true,
+    description: 'Distrito',
+    example: '010101',
+  })
+  ubigeoDistrictId: string;
+
+  @ApiProperty({
+    required: true,
     description: 'Provincia',
     example: '0101',
   })
@@ -124,10 +121,12 @@ export class RegistrationDto {
 
   @ApiProperty({
     required: true,
-    description: 'Distrito',
-    example: '010101',
+    description: 'IDs de Roles',
+    example: [1],
   })
-  ubigeoDistrictId: string;
+  @IsArray()
+  @IsNotEmpty()
+  roleIds: number[];
 
   @ApiProperty({
     required: true,

@@ -1,14 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountsRepository } from './accounts.repository';
 import { Account } from '@prisma/client';
+import { AccountDto } from './dto/account.dto';
 
 @Injectable()
 export class AccountsService {
   constructor(private repository: AccountsRepository) {}
-
-  public async findAll(): Promise<Account[]> {
-    return this.repository.getAccounts({});
-  }
 
   public async findByID(id: string): Promise<Account> {
     const account = await this.repository.getAccount({ id });
@@ -16,5 +13,28 @@ export class AccountsService {
       throw new HttpException('Account not found', HttpStatus.NOT_FOUND);
     }
     return account;
+  }
+
+  public async findByCredentialIdentifier(
+    identifier: string,
+  ): Promise<Omit<Account, 'roleId' | 'subroleId'>> {
+    const account = await this.repository.getAccountByCredentialIdentifier(
+      identifier,
+    );
+    if (!account) {
+      throw new HttpException('Account not found', HttpStatus.NOT_FOUND);
+    }
+    return account;
+  }
+
+  public async findAll(): Promise<Account[]> {
+    return this.repository.getAccounts({});
+  }
+
+  public async update(id: string, data: AccountDto): Promise<Account> {
+    return await this.repository.updateAccount({
+      data,
+      where: { id },
+    });
   }
 }

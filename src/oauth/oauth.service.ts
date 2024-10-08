@@ -1,4 +1,4 @@
-import { Injectable, Req } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { checkPassword, passwordToHash } from '../helpers/password.helper';
 import { Algorithm, sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
@@ -11,7 +11,13 @@ import {
   bad_request,
   refresh_token_expired_signature,
 } from '../errors';
-import { Account, Credential, RecoveryKey, Role } from '@prisma/client';
+import {
+  Account,
+  Credential,
+  PrismaClient,
+  RecoveryKey,
+  Subrole,
+} from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegistrationDto } from './dto/registration.dto';
 import { SignInDto } from './dto/sign-in.dto';
@@ -25,7 +31,14 @@ export interface IJWTToken {
 export interface IJWTPayload {
   id: string;
   identifier: string;
-  role: Role;
+  permissions: {
+    subroles: {
+      id: number;
+      name: string;
+      roleId: number;
+      roleName: string;
+    }[];
+  }[];
   is_blocked: boolean;
 }
 
@@ -96,6 +109,17 @@ export class OauthService {
         },
       });
 
+      if (account.subroleIds) {
+        const permissionsData = account.subroleIds.map((subroleId) => ({
+          accountId: insertedAccount.id,
+          subroleId: subroleId,
+        }));
+
+        await tx.permission.createMany({
+          data: permissionsData,
+        });
+      }
+
       return await this.regenerateRecoveryKeys(tx, insertedAccount.id);
     });
   }
@@ -126,6 +150,15 @@ export class OauthService {
         },
         include: {
           credential: true,
+          permission: {
+            include: {
+              subrole: {
+                include: {
+                  role: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -173,6 +206,15 @@ export class OauthService {
         },
         include: {
           credential: true,
+          permission: {
+            include: {
+              subrole: {
+                include: {
+                  role: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -226,6 +268,9 @@ export class OauthService {
   private async generateJWT(
     account: Account & {
       credential: Credential;
+      permission: {
+        subrole?: (Subrole & { role: { id: number; name: string } }) | null;
+      }[];
     },
   ) {
     const refresh = await this.prisma.refreshToken.create({
@@ -277,8 +322,8 @@ export class OauthService {
 
   public async regenerateRecoveryKeys(
     prisma: Omit<
-      PrismaService,
-      '$connect' | '$disconnect' | '$on' | '$transaction' | '$use'
+      PrismaClient,
+      '$connect' | '$disconnect' | '$on' | '$transaction' | '$use' | '$extends'
     >,
     accountID: string,
   ) {
@@ -317,12 +362,26 @@ export class OauthService {
   public jsonForJWT(
     account: Account & {
       credential: Credential;
+      permission: {
+        subrole?: (Subrole & { role: { id: number; name: string } }) | null; // Incluye el role aquí
+      }[];
     },
   ): IJWTPayload {
     return {
       id: account.id,
       identifier: account.credential.identifier,
-      role: account.role,
+      permissions: account.permission.map((permission) => ({
+        subroles: permission.subrole
+          ? [
+              {
+                id: permission.subrole.id,
+                name: permission.subrole.name,
+                roleId: permission.subrole.role.id,
+                roleName: permission.subrole.role.name,
+              },
+            ]
+          : [],
+      })),
       is_blocked: account.isBlocked,
     };
   }
