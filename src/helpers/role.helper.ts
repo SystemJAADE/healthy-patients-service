@@ -33,8 +33,8 @@ export const RoleGuard = (): Type<CanActivate> => {
 
       const hasRole = requiredRoles
         ? requiredRoles.some((role) =>
-            account.permissions.some(
-              (permission) => permission.role.name === role,
+            account.permissions.some((permission) =>
+              permission.subroles.some((sub) => sub.roleName === role),
             ),
           )
         : true;

@@ -11,9 +11,7 @@ export class AccountsRepository {
     return this.prisma.account.findUnique({ where });
   }
 
-  async getAccountByCredentialIdentifier(
-    identifier: string,
-  ): Promise<Omit<Account, 'roleId' | 'subroleId'> | null> {
+  async getAccountByCredentialIdentifier(identifier: string): Promise<any> {
     const account = await this.prisma.account.findFirst({
       where: {
         credential: {
@@ -23,9 +21,13 @@ export class AccountsRepository {
       include: {
         permission: {
           include: {
-            role: {
+            subrole: {
               include: {
-                subroles: true,
+                role: {
+                  include: {
+                    subroles: true,
+                  },
+                },
               },
             },
           },
@@ -34,11 +36,51 @@ export class AccountsRepository {
     });
 
     if (account && account.permission) {
+      const permissionsMap = new Map<
+        number,
+        {
+          roleId: number;
+          name: string;
+          subroles: { id: number; name: string }[];
+        }
+      >();
+
       account.permission.forEach((perm) => {
-        perm.role.subroles = perm.role.subroles.filter(
-          (subrole) => subrole.id === perm.subroleId,
-        );
+        const role = perm.subrole.role;
+
+        if (permissionsMap.has(role.id)) {
+          const existingPermission = permissionsMap.get(role.id);
+          if (existingPermission) {
+            const existingSubroleIds = new Set(
+              existingPermission.subroles.map((sub) => sub.id),
+            );
+            if (!existingSubroleIds.has(perm.subrole.id)) {
+              existingPermission.subroles.push({
+                id: perm.subrole.id,
+                name: perm.subrole.name,
+              });
+            }
+          }
+        } else {
+          permissionsMap.set(role.id, {
+            roleId: role.id,
+            name: role.name,
+            subroles: [
+              {
+                id: perm.subrole.id,
+                name: perm.subrole.name,
+              },
+            ],
+          });
+        }
       });
+
+      const permissionsArray = Array.from(permissionsMap.values());
+
+      return {
+        ...account,
+        permission: permissionsArray,
+      };
     }
 
     return account;
@@ -111,9 +153,13 @@ export class AccountsRepository {
         include: {
           permission: {
             include: {
-              role: {
+              subrole: {
                 include: {
-                  subroles: true,
+                  role: {
+                    include: {
+                      subroles: true,
+                    },
+                  },
                 },
               },
             },
@@ -123,9 +169,12 @@ export class AccountsRepository {
 
       if (accountWithPermissions && accountWithPermissions.permission) {
         accountWithPermissions.permission.forEach((perm) => {
-          perm.role.subroles = perm.role.subroles.filter(
-            (subrole) => subrole.id === perm.subroleId,
-          );
+          const role = perm.subrole.role;
+          if (role) {
+            role.subroles = role.subroles.filter(
+              (subrole) => subrole.id === perm.subroleId,
+            );
+          }
         });
       }
 

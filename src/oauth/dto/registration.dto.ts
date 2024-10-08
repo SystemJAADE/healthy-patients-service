@@ -131,15 +131,6 @@ export class RegistrationDto {
 
   @ApiProperty({
     required: true,
-    description: 'IDs de Roles',
-    example: [1],
-  })
-  @IsArray()
-  @IsNotEmpty()
-  roleIds: number[];
-
-  @ApiProperty({
-    required: true,
     description: 'IDs de Subroles',
     example: [1],
   })

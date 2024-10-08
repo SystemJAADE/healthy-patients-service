@@ -16,7 +16,6 @@ import {
   Credential,
   PrismaClient,
   RecoveryKey,
-  Role,
   Subrole,
 } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
@@ -33,8 +32,12 @@ export interface IJWTPayload {
   id: string;
   identifier: string;
   permissions: {
-    role: Role;
-    subroles: Subrole[];
+    subroles: {
+      id: number;
+      name: string;
+      roleId: number;
+      roleName: string;
+    }[];
   }[];
   is_blocked: boolean;
 }
@@ -106,11 +109,10 @@ export class OauthService {
         },
       });
 
-      if (account.roleIds && account.subroleIds) {
-        const permissionsData = account.roleIds.map((roleId, index) => ({
+      if (account.subroleIds) {
+        const permissionsData = account.subroleIds.map((subroleId) => ({
           accountId: insertedAccount.id,
-          roleId: roleId,
-          subroleId: account.subroleIds[index],
+          subroleId: subroleId,
         }));
 
         await tx.permission.createMany({
@@ -150,9 +152,9 @@ export class OauthService {
           credential: true,
           permission: {
             include: {
-              role: {
+              subrole: {
                 include: {
-                  subroles: true,
+                  role: true,
                 },
               },
             },
@@ -206,9 +208,9 @@ export class OauthService {
           credential: true,
           permission: {
             include: {
-              role: {
+              subrole: {
                 include: {
-                  subroles: true,
+                  role: true,
                 },
               },
             },
@@ -267,9 +269,7 @@ export class OauthService {
     account: Account & {
       credential: Credential;
       permission: {
-        role: Role & {
-          subroles: Subrole[];
-        };
+        subrole?: (Subrole & { role: { id: number; name: string } }) | null;
       }[];
     },
   ) {
@@ -363,9 +363,7 @@ export class OauthService {
     account: Account & {
       credential: Credential;
       permission: {
-        role: Role & {
-          subroles: Subrole[];
-        };
+        subrole?: (Subrole & { role: { id: number; name: string } }) | null; // Incluye el role aquí
       }[];
     },
   ): IJWTPayload {
@@ -373,8 +371,16 @@ export class OauthService {
       id: account.id,
       identifier: account.credential.identifier,
       permissions: account.permission.map((permission) => ({
-        role: permission.role,
-        subroles: permission.role.subroles,
+        subroles: permission.subrole
+          ? [
+              {
+                id: permission.subrole.id,
+                name: permission.subrole.name,
+                roleId: permission.subrole.role.id,
+                roleName: permission.subrole.role.name,
+              },
+            ]
+          : [],
       })),
       is_blocked: account.isBlocked,
     };
