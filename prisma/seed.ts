@@ -3891,41 +3891,63 @@ const ubigeoDistrictsData = [
   { id: '250401', name: 'Purus', provinceId: '2504', departmentId: '25' },
 ];
 
+const rolesData = [
+  { id: 1, name: 'Admin' },
+  { id: 2, name: 'Doctor' },
+  { id: 3, name: 'Patient' },
+  { id: 4, name: 'Not fully registered' },
+];
+
+const subrolesData = [
+  { id: 1, name: 'Admin', roleId: 1 },
+  { id: 2, name: 'Cajero', roleId: 1 },
+  { id: 3, name: 'Farmaceutico', roleId: 1 },
+  { id: 4, name: 'Contador', roleId: 1 },
+  { id: 5, name: 'Doctor', roleId: 2 },
+  { id: 6, name: 'Enfermero', roleId: 2 },
+  { id: 7, name: 'Medico cirujano', roleId: 2 },
+  { id: 8, name: 'Medico general', roleId: 2 },
+  { id: 9, name: 'Medico de cabecera', roleId: 2 },
+  { id: 10, name: 'Psicologo', roleId: 2 },
+  { id: 11, name: 'Terapeuta sensorial', roleId: 2 },
+  { id: 12, name: 'Terapeuta ocupacional', roleId: 2 },
+  { id: 13, name: 'Terapeuta fisico', roleId: 2 },
+  { id: 14, name: 'Terapeuta lenguaje', roleId: 2 },
+  { id: 15, name: 'Radiologo', roleId: 2 },
+  { id: 16, name: 'Quimico farmaceutico', roleId: 2 },
+  { id: 17, name: 'Dentista', roleId: 2 },
+  { id: 18, name: 'Patient', roleId: 3 },
+  { id: 19, name: 'Not fully registered', roleId: 4 },
+];
+
 async function main() {
-  const prismaUbigeoDepartments = ubigeoDepartmentsData.map(({ id, name }) => ({
-    id,
-    name,
-  }));
-
-  const prismaUbigeoProvinces = ubigeoProvincesData.map(
-    ({ id, name, departmentId }) => ({ id, name, departmentId }),
-  );
-
-  const prismaUbigeoDistricts = ubigeoDistrictsData.map(
-    ({ id, name, provinceId, departmentId }) => ({
-      id,
-      name,
-      provinceId,
-      departmentId,
-    }),
-  );
-
+  // ++ Ubigeo data
   console.log('Deleting provinces, districts and departments...');
   await prisma.ubigeoDistrict.deleteMany();
   await prisma.ubigeoProvince.deleteMany();
   await prisma.ubigeoDepartment.deleteMany();
 
   console.log('Seeding departments...');
-
-  await prisma.ubigeoDepartment.createMany({ data: prismaUbigeoDepartments });
+  await prisma.ubigeoDepartment.createMany({ data: ubigeoDepartmentsData });
 
   console.log('Seeding provinces...');
-
-  await prisma.ubigeoProvince.createMany({ data: prismaUbigeoProvinces });
+  await prisma.ubigeoProvince.createMany({ data: ubigeoProvincesData });
 
   console.log('Seeding districts...');
+  await prisma.ubigeoDistrict.createMany({ data: ubigeoDistrictsData });
+  // -- Ubigeo data
 
-  await prisma.ubigeoDistrict.createMany({ data: prismaUbigeoDistricts });
+  // ++ Roles and subroles data
+  console.log('Deleting roles and subroles...');
+  await prisma.subrole.deleteMany();
+  await prisma.role.deleteMany();
+
+  console.log('Seeding roles...');
+  await prisma.role.createMany({ data: rolesData });
+
+  console.log('Seeding subroles...');
+  await prisma.subrole.createMany({ data: subrolesData });
+  // -- Roles and subroles data
 }
 
 main()
