@@ -9,14 +9,11 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { RoleGuard, Roles } from '../helpers/role.helper';
 import { AccountsService } from './accounts.service';
 import { AccountDto } from './dto/account.dto';
 
 @Controller('accounts')
-@ApiTags('accounts')
-@ApiBearerAuth()
 @UseInterceptors(ClassSerializerInterceptor)
 @UseGuards(RoleGuard())
 export class AccountsController {
