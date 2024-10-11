@@ -9,17 +9,7 @@ import { JwtPayloadDto } from './dto/jwt-payload.dto';
 export class AccountsService {
   constructor(private repository: AccountsRepository) {}
 
-  public async findByID(id: string): Promise<Account> {
-    const account = await this.repository.getAccount({ id });
-    if (!account) {
-      throw new HttpException('Account not found', HttpStatus.NOT_FOUND);
-    }
-    return account;
-  }
-
-  public async findByCredentialIdentifier(
-    identifier: string,
-  ): Promise<Omit<Account, 'roleId' | 'subroleId'>> {
+  public async findByCredentialIdentifier(identifier: string): Promise<any> {
     const account = await this.repository.getAccountByCredentialIdentifier(
       identifier,
     );
