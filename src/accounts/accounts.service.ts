@@ -2,6 +2,8 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { AccountsRepository } from './accounts.repository';
 import { Account } from '@prisma/client';
 import { AccountDto } from './dto/account.dto';
+import * as jwt from 'jsonwebtoken';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class AccountsService {
@@ -27,8 +29,13 @@ export class AccountsService {
     return account;
   }
 
-  public async findAll(): Promise<Account[]> {
-    return this.repository.getAccounts({});
+  public async findCurrentUser(
+    authorization: string,
+  ): Promise<Omit<Account, 'roleId' | 'subroleId'>> {
+    const accessToken = authorization.split(' ')[1];
+    const decodedToken = jwt.decode(accessToken) as JwtPayloadDto;
+    const identifier = decodedToken.current_account.identifier;
+    return this.findByCredentialIdentifier(identifier);
   }
 
   public async update(id: string, data: AccountDto): Promise<Account> {
