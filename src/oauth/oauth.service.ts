@@ -8,7 +8,7 @@ import {
   Subrole,
 } from '@prisma/client';
 import { Algorithm, sign, verify } from 'jsonwebtoken';
-import { DEFAULT_SUBROLE_ID } from 'src/constants/constants';
+import { DEFAULT_SUBROLE_ID } from 'src/constants';
 import { v4 } from 'uuid';
 import {
   access_token_expired_signature,
