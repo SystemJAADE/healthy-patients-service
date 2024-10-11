@@ -6,9 +6,8 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { RoleGuard } from '../helpers/role.helper';
+import { RoleGuard, Roles } from '../helpers/role.helper';
 import { CredentialsService } from './credentials.service';
-import { Role } from '@prisma/client';
 
 @Controller('credentials')
 @ApiTags('credentials')
@@ -18,7 +17,8 @@ export class CredentialsController {
   constructor(private readonly credentialService: CredentialsService) {}
 
   @Get()
-  @UseGuards(RoleGuard(Role.ADMIN))
+  @Roles('Admin')
+  @UseGuards(RoleGuard())
   public findAll() {
     return this.credentialService.findAll();
   }
