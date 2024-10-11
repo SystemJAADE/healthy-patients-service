@@ -1,10 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
-import { SwaggerTheme, SwaggerThemeNameEnum } from 'swagger-themes';
+import { setupSwagger } from './swagger/swagger.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -29,22 +28,7 @@ async function bootstrap() {
     }),
   );
 
-  const swaggerConfig = new DocumentBuilder()
-    .setTitle('Healthy patients service')
-    .setDescription('TODO Description')
-    .setVersion('0.0.1')
-    .setExternalDoc('Postman Collection', '/api-json')
-    .addBearerAuth()
-    .build();
-
-  const document = SwaggerModule.createDocument(app, swaggerConfig);
-  const theme = new SwaggerTheme();
-  const options = {
-    explorer: true,
-    customCss: theme.getBuffer(SwaggerThemeNameEnum.ONE_DARK),
-  };
-
-  SwaggerModule.setup('api', app, document, options);
+  setupSwagger(app);
 
   const host = configService.get('APP_HOST') ?? 'localhost';
   const port = configService.get('APP_PORT') ?? 3000;
