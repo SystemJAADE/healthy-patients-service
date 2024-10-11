@@ -1,13 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Gender } from '@prisma/client';
-import {
-  IsArray,
-  IsEnum,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-  Length,
-} from 'class-validator';
+import { IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class RegistrationDto {
   @ApiProperty({
@@ -128,13 +121,4 @@ export class RegistrationDto {
     example: '010101',
   })
   ubigeoDistrictId: string;
-
-  @ApiProperty({
-    required: true,
-    description: 'IDs de Subroles',
-    example: [1],
-  })
-  @IsArray()
-  @IsOptional()
-  subroleIds?: number[];
 }

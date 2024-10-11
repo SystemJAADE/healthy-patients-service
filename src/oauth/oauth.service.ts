@@ -1,16 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { checkPassword, passwordToHash } from '../helpers/password.helper';
-import { Algorithm, sign, verify } from 'jsonwebtoken';
 import { ConfigService } from '@nestjs/config';
-import { v4 } from 'uuid';
-import { validateDTO } from '../helpers/validate.helper';
-import {
-  access_token_expired_signature,
-  account_blocked,
-  authorization_failed,
-  bad_request,
-  refresh_token_expired_signature,
-} from '../errors';
 import {
   Account,
   Credential,
@@ -18,6 +7,18 @@ import {
   RecoveryKey,
   Subrole,
 } from '@prisma/client';
+import { Algorithm, sign, verify } from 'jsonwebtoken';
+import { DEFAULT_SUBROLE_ID } from 'src/constants/constants';
+import { v4 } from 'uuid';
+import {
+  access_token_expired_signature,
+  account_blocked,
+  authorization_failed,
+  bad_request,
+  refresh_token_expired_signature,
+} from '../errors';
+import { checkPassword, passwordToHash } from '../helpers/password.helper';
+import { validateDTO } from '../helpers/validate.helper';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegistrationDto } from './dto/registration.dto';
 import { SignInDto } from './dto/sign-in.dto';
@@ -109,16 +110,12 @@ export class OauthService {
         },
       });
 
-      if (account.subroleIds) {
-        const permissionsData = account.subroleIds.map((subroleId) => ({
+      await tx.permission.create({
+        data: {
           accountId: insertedAccount.id,
-          subroleId: subroleId,
-        }));
-
-        await tx.permission.createMany({
-          data: permissionsData,
-        });
-      }
+          subroleId: DEFAULT_SUBROLE_ID,
+        },
+      });
 
       return await this.regenerateRecoveryKeys(tx, insertedAccount.id);
     });
