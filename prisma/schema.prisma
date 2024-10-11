@@ -11,39 +11,69 @@ datasource db {
 }
 
 model Account {
+  id                 String            @id @default(uuid()) @db.VarChar(36)
+  patient            Patient?
+  doctor             Doctor?
+  admin              Admin?
+  permission         Permission[]
+  isBlocked          Boolean           @map("is_blocked") @db.TinyInt()
+  firstSurname       String?           @map("first_surname") @db.VarChar(64)
+  secondSurname      String?           @map("second_surname") @db.VarChar(64)
+  firstName          String?           @map("first_name") @db.VarChar(64)
+  middleName         String?           @map("middle_name") @db.VarChar(64)
+  documentIdentity   String?           @map("document_identity") @db.VarChar(32)
+  gender             Gender?
+  cellPhone          String?           @map("cell_phone") @db.VarChar(32)
+  homePhone          String?           @map("home_phone") @db.VarChar(32)
+  address            String?           @db.VarChar(256)
+  ubigeoDepartmentId String?           @map("ubigeo_department_id")
+  ubigeoDepartment   UbigeoDepartment? @relation(fields: [ubigeoDepartmentId], references: [id])
+  ubigeoProvinceId   String?           @map("ubigeo_province_id")
+  ubigeoProvince     UbigeoProvince?   @relation(fields: [ubigeoProvinceId], references: [id])
+  ubigeoDistrictId   String?           @map("ubigeo_district_id")
+  ubigeoDistrict     UbigeoDistrict?   @relation(fields: [ubigeoDistrictId], references: [id])
+  credentialId       String?           @unique @map("credential_id") @db.VarChar(36)
+  credential         Credential?       @relation(fields: [credentialId], references: [id])
+  refreshTokens      RefreshToken[]
+  recoveryKeys       RecoveryKey[]
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+
+  @@map("accounts")
+}
+
+model Patient {
   // TODO: Zerofill isn't supported by prisma
   // The field 'medicalRecordNumber' must be of that type and with a limit of 6 digits
   // See: https://github.com/prisma/prisma/discussions/13988
   // It's possible to add it modifying manually the migration file
-  id                    String                  @id @default(uuid()) @db.VarChar(36)
-  medicalRecordNumber   Int                     @unique @default(autoincrement()) @map("medical_record_number")
-  permission            Permission[]
-  isBlocked             Boolean                 @map("is_blocked") @db.TinyInt()
-  firstSurname          String?                 @map("first_surname") @db.VarChar(64)
-  secondSurname         String?                 @map("second_surname") @db.VarChar(64)
-  firstName             String?                 @map("first_name") @db.VarChar(64)
-  middleName            String?                 @map("middle_name") @db.VarChar(64)
-  documentIdentity      String?                 @map("document_identity") @db.VarChar(32)
-  gender                Gender?
-  cellPhone             String?                 @map("cell_phone") @db.VarChar(32)
-  homePhone             String?                 @map("home_phone") @db.VarChar(32)
-  address               String?                 @db.VarChar(256)
-  ubigeoDepartmentId    String?                 @map("ubigeo_department_id")
-  ubigeoDepartment      UbigeoDepartment?       @relation(fields: [ubigeoDepartmentId], references: [id])
-  ubigeoProvinceId      String?                 @map("ubigeo_province_id")
-  ubigeoProvince        UbigeoProvince?         @relation(fields: [ubigeoProvinceId], references: [id])
-  ubigeoDistrictId      String?                 @map("ubigeo_district_id")
-  ubigeoDistrict        UbigeoDistrict?         @relation(fields: [ubigeoDistrictId], references: [id])
-  credentialId          String?                 @unique @map("credential_id") @db.VarChar(36)
-  credential            Credential?             @relation(fields: [credentialId], references: [id])
-  refreshTokens         RefreshToken[]
-  recoveryKeys          RecoveryKey[]
-  Triages               Triage[]
-  DailyAttendanceRecord DailyAttendanceRecord[]
-  createdAt             DateTime                @default(now()) @map("created_at")
-  updatedAt             DateTime                @updatedAt @map("updated_at")
+  medicalRecordNumber         Int                     @id @unique @default(autoincrement()) @map("medical_record_number")
+  bloodType                   String?                 @map("blood_type") @db.VarChar(8)
+  allergies                   String?                 @db.VarChar(256)
+  personalPathologicalHistory String?                 @map("personal_pathological_history") @db.VarChar(256)
+  familyPathologicalHistory   String?                 @map("family_pathological_history") @db.VarChar(256)
+  accountId                   String                  @unique @map("account_id")
+  account                     Account                 @relation(fields: [accountId], references: [id])
+  Triages                     Triage[]
+  DailyAttendanceRecord       DailyAttendanceRecord[]
 
-  @@map("accounts")
+  @@map("patients")
+}
+
+model Doctor {
+  licenseNumber String  @id @unique @map("license_number") @db.VarChar(32)
+  accountId     String  @unique @map("account_id")
+  account       Account @relation(fields: [accountId], references: [id])
+
+  @@map("doctors")
+}
+
+model Admin {
+  id        Int     @id @default(autoincrement())
+  accountId String  @unique @map("account_id")
+  account   Account @relation(fields: [accountId], references: [id])
+
+  @@map("admins")
 }
 
 model UbigeoDepartment {
@@ -107,7 +137,7 @@ model RecoveryKey {
 model Triage {
   id                    Int                     @id @default(autoincrement())
   medicalRecordNumber   Int                     @map("medical_record_number")
-  account               Account?                @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
+  patient               Patient?                @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
   triageType            TriageType              @map("triage_type")
   time                  DateTime                @default(now()) @db.DateTime(0)
   bloodPressure         String?                 @map("blood_pressure") @db.VarChar(10)
@@ -127,7 +157,7 @@ model Triage {
 model DailyAttendanceRecord {
   id                  Int            @id @default(autoincrement())
   medicalRecordNumber Int            @map("medical_record_number")
-  patient             Account?       @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
+  patient             Patient?       @relation(fields: [medicalRecordNumber], references: [medicalRecordNumber], onDelete: Cascade)
   triageId            Int            @map("triage_id")
   triage              Triage?        @relation(fields: [triageId], references: [id], onDelete: Cascade)
   icd10DiagnosisId    Int            @map("icd10_diagnosis_id")
@@ -191,9 +221,9 @@ model Specialty {
 }
 
 model Role {
-  id          Int          @id @default(autoincrement())
-  name        String       @unique
-  subroles    Subrole[]
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  subroles Subrole[]
 
   @@map("roles")
 }
