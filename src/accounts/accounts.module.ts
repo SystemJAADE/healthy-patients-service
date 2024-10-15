@@ -3,9 +3,11 @@ import { AccountsService } from './accounts.service';
 import { AccountsController } from './accounts.controller';
 import { AccountsRepository } from './accounts.repository';
 import { PrismaModule } from '../prisma/prisma.module';
+import { HttpModule } from '@nestjs/axios';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [PrismaModule],
+  imports: [PrismaModule, ConfigModule, HttpModule],
   providers: [AccountsService, AccountsRepository],
   exports: [AccountsService, AccountsRepository],
   controllers: [AccountsController],

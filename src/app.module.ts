@@ -22,6 +22,7 @@ import { TriagesModule } from './triages/triages.module';
         DB_PASS: Joi.string().required(),
         RATELIMIT_TTL: Joi.number().required(),
         RATELIMIT_LIMIT: Joi.number().required(),
+        ASSETS_URL: Joi.string().required(),
       }),
     }),
     RatelimitModule,
