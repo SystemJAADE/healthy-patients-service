@@ -4,10 +4,19 @@ import { Account } from '@prisma/client';
 import { AccountDto } from './dto/account.dto';
 import * as jwt from 'jsonwebtoken';
 import { JwtPayloadDto } from './dto/jwt-payload.dto';
+import { ConfigService } from '@nestjs/config';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { BufferedImageDto } from './dto/buffered-image.dto';
+import * as FormData from 'form-data';
 
 @Injectable()
 export class AccountsService {
-  constructor(private repository: AccountsRepository) {}
+  constructor(
+    private repository: AccountsRepository,
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {}
 
   public async findByCredentialIdentifier(identifier: string): Promise<any> {
     const account = await this.repository.getAccountByCredentialIdentifier(
@@ -33,5 +42,50 @@ export class AccountsService {
       data,
       where: { id },
     });
+  }
+
+  public async getAvatar(id: string): Promise<Buffer> {
+    const assetsUrl = this.configService.get<string>('ASSETS_URL');
+
+    let data: ArrayBuffer;
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${assetsUrl}/accounts/${id}/avatar/`, {
+          responseType: 'arraybuffer',
+        }),
+      );
+      data = response.data;
+    } catch (error) {
+      throw new HttpException('Avatar not found', HttpStatus.NOT_FOUND);
+    }
+
+    return Buffer.from(data);
+  }
+
+  public async uploadAvatar(id: string, image: BufferedImageDto) {
+    const assetsUrl = this.configService.get<string>('ASSETS_URL');
+    const formData = new FormData();
+
+    formData.append('image', image.buffer, {
+      filename: image.originalname,
+      contentType: image.mimetype,
+    });
+
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.post(
+          `${assetsUrl}/accounts/${id}/avatar/upload`,
+          formData,
+          {
+            headers: {
+              ...formData.getHeaders(),
+            },
+          },
+        ),
+      );
+      return data;
+    } catch (error) {
+      throw new HttpException('Error uploading avatar', HttpStatus.BAD_REQUEST);
+    }
   }
 }

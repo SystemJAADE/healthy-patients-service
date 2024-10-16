@@ -8,6 +8,7 @@ import { OauthModule } from './oauth/oauth.module';
 import { OAuthMiddleware } from './oauth/oauth.middleware';
 import { RatelimitModule } from './ratelimit/ratelimit.module';
 import { TriagesModule } from './triages/triages.module';
+import { UbigeoModule } from './ubigeo/ubigeo.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TriagesModule } from './triages/triages.module';
         DB_PASS: Joi.string().required(),
         RATELIMIT_TTL: Joi.number().required(),
         RATELIMIT_LIMIT: Joi.number().required(),
+        ASSETS_URL: Joi.string().required(),
       }),
     }),
     RatelimitModule,
@@ -30,6 +32,7 @@ import { TriagesModule } from './triages/triages.module';
     AccountsModule,
     OauthModule,
     TriagesModule,
+    UbigeoModule,
   ],
   controllers: [],
   providers: [],
@@ -42,6 +45,12 @@ export class AppModule {
         { path: 'oauth/token', method: RequestMethod.ALL },
         { path: 'oauth/registration', method: RequestMethod.ALL },
         { path: 'oauth/change_password', method: RequestMethod.ALL },
+        { path: 'ubigeo/departments', method: RequestMethod.GET },
+        { path: 'ubigeo/provinces/:departmentId', method: RequestMethod.GET },
+        {
+          path: 'ubigeo/districts/:departmentId/:provinceId',
+          method: RequestMethod.GET,
+        },
       )
       .forRoutes('*');
   }
