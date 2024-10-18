@@ -319,6 +319,12 @@
             "description": "Segundo nombre",
             "example": "Diego"
           },
+          "documentType": {
+            "type": "string",
+            "description": "Tipo de documento",
+            "enum": ["DNI", "FOREIGN_CARD", "PASSPORT", "NOT_FOUND"],
+            "example": "DNI"
+          },
           "documentIdentity": {
             "type": "string",
             "description": "Documento de identidad",
@@ -327,17 +333,13 @@
           "gender": {
             "type": "string",
             "description": "Género",
+            "enum": ["MALE", "FEMALE", "NEITHER"],
             "example": "MALE"
           },
           "cellPhone": {
             "type": "string",
             "description": "Celular",
             "example": "987654321"
-          },
-          "homePhone": {
-            "type": "string",
-            "description": "Teléfono fijo",
-            "example": "5432100"
           },
           "address": {
             "type": "string",
@@ -349,31 +351,20 @@
             "description": "Departamento",
             "example": "01"
           },
-          "ubigeoDistrictId": {
-            "type": "string",
-            "description": "Distrito",
-            "example": "010101"
-          },
           "ubigeoProvinceId": {
             "type": "string",
             "description": "Provincia",
             "example": "0101"
           },
-          "roleIds": {
-            "type": "array",
-            "description": "IDs de Roles",
-            "items": {
-              "type": "integer"
-            },
-            "example": [1]
+          "ubigeoDistrictId": {
+            "type": "string",
+            "description": "Distrito",
+            "example": "010101"
           },
-          "subroleIds": {
-            "type": "array",
-            "description": "IDs de Subroles",
-            "items": {
-              "type": "integer"
-            },
-            "example": [1]
+          "emailAddress": {
+            "type": "string",
+            "description": "Direccion de correo electronico",
+            "example": "test@mail.com"
           }
         },
         "required": [
@@ -382,13 +373,15 @@
           "firstSurname",
           "secondSurname",
           "firstName",
+          "documentType",
           "documentIdentity",
           "gender",
           "cellPhone",
           "address",
           "ubigeoDepartmentId",
-          "ubigeoDistrictId",
           "ubigeoProvinceId",
+          "ubigeoDistrictId",
+          "emailAddress",
           "roleIds"
         ]
       },
