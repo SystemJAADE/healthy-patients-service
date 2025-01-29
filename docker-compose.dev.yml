@@ -25,12 +25,12 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
-      target: development # XXX: development/production
+      target: development
     depends_on:
       mysql:
         condition: service_healthy
     tty: true
-    command: ['/bin/sh', '/usr/src/app/bin/start-dev.sh'] # XXX: start-dev.sh/start-prod.sh
+    command: ['/bin/sh', '/usr/src/app/bin/start-dev.sh']
     # Workaround para que prisma cargue correctamente en el contenedor (https://github.com/prisma/prisma/issues/13396)
     environment:
       - PRISMA_QUERY_ENGINE_LIBRARY=/usr/src/app/node_modules/.prisma/client/libquery_engine-debian-openssl-1.0.x.so.node
