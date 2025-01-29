@@ -5,7 +5,7 @@
 FROM node:lts-bullseye-slim AS development
 
 # Instalar las dependencias necesarias para hot reloading
-RUN apt-get update && apt-get install -y procps openssl
+RUN apt-get update && apt-get install -y procps openssl git
 
 # Crear la carpeta de la app
 WORKDIR /usr/src/app
