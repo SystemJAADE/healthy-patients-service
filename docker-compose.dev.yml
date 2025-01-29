@@ -22,6 +22,7 @@ services:
 
   # Si se desea usar el contenedor en modo producción, modificar los campos con XXX
   api:
+    platform: linux/amd64
     build:
       dockerfile: Dockerfile
       context: .
