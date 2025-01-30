@@ -42,7 +42,7 @@ services:
       - /usr/src/app/node_modules
       - .:/usr/src/app
     ports:
-      - ${APP_PORT}
+      - ${APP_PORT}:${APP_PORT}
 
 volumes:
   db-data:
