@@ -81,10 +81,10 @@ export class OauthService {
           secondSurname: account.secondSurname,
           firstName: account.firstName,
           middleName: account.middleName,
+          documentType: account.documentType,
           documentIdentity: account.documentIdentity,
           gender: account.gender,
           cellPhone: account.cellPhone,
-          homePhone: account.homePhone,
           address: account.address,
           ubigeoDepartment: {
             connect: {
@@ -101,6 +101,7 @@ export class OauthService {
               id: account.ubigeoProvinceId,
             },
           },
+          emailAddress: account.emailAddress,
           credential: {
             create: {
               identifier: account.username,

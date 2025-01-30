@@ -112,19 +112,14 @@ export class AccountsRepository {
           secondSurname: data.secondSurname,
           firstName: data.firstName,
           middleName: data.middleName,
+          documentType: data.documentType,
           documentIdentity: data.documentIdentity,
           gender: data.gender,
           cellPhone: data.cellPhone,
-          homePhone: data.homePhone,
           address: data.address,
           ubigeoDepartment: {
             connect: {
               id: data.ubigeoDepartmentId,
-            },
-          },
-          ubigeoDistrict: {
-            connect: {
-              id: data.ubigeoDistrictId,
             },
           },
           ubigeoProvince: {
@@ -132,6 +127,12 @@ export class AccountsRepository {
               id: data.ubigeoProvinceId,
             },
           },
+          ubigeoDistrict: {
+            connect: {
+              id: data.ubigeoDistrictId,
+            },
+          },
+          emailAddress: data.emailAddress,
         },
       });
 
