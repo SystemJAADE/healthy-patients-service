@@ -1,0 +1,52 @@
+services:
+  mysql:
+    image: mysql
+    environment:
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_HOST: ${DB_HOST}
+      MYSQL_PORT: ${DB_PORT}
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./ext/init_shadow_db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: '/usr/bin/mysql --host=$$MYSQL_HOST --port=MYSQL_PORT --user=$$MYSQL_USER --password=$$MYSQL_PASSWORD --execute "SHOW DATABASES;"'
+      interval: 2s
+      timeout: 20s
+      retries: 10
+    # Comentar para dejar de exponer el puerto a la máquina host
+    ports:
+      - ${DB_PORT}:${DB_PORT}
+
+  # Si se desea usar el contenedor en modo producción, modificar los campos con XXX
+  api:
+    platform: linux/amd64
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: development
+    depends_on:
+      mysql:
+        condition: service_healthy
+    tty: true
+    command: ['/bin/sh', '/usr/src/app/bin/start-dev.sh']
+    # Workaround para que prisma cargue correctamente en el contenedor (https://github.com/prisma/prisma/issues/13396)
+    environment:
+      - PRISMA_QUERY_ENGINE_LIBRARY=/usr/src/app/node_modules/.prisma/client/libquery_engine-debian-openssl-1.0.x.so.node
+    env_file:
+      - .env
+    volumes:
+      - .env:/usr/src/app/.env:ro
+      - /usr/src/app/node_modules
+      - .:/usr/src/app
+    ports:
+      - ${APP_PORT}:${APP_PORT}
+
+volumes:
+  db-data:
+
+networks:
+  default:
+    name: healthy-next-network
