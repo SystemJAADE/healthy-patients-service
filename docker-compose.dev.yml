@@ -16,9 +16,9 @@ services:
       interval: 2s
       timeout: 20s
       retries: 10
-    # Descomentar para exponer el puerto a la máquina host
-    #ports:
-    #- ${DB_PORT}:${DB_PORT}
+    # Comentar para dejar de exponer el puerto a la máquina host
+    ports:
+      - ${DB_PORT}:${DB_PORT}
 
   # Si se desea usar el contenedor en modo producción, modificar los campos con XXX
   api:
@@ -42,7 +42,7 @@ services:
       - /usr/src/app/node_modules
       - .:/usr/src/app
     ports:
-      - ${APP_PORT}
+      - ${APP_PORT}:${APP_PORT}
 
 volumes:
   db-data:
