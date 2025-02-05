@@ -1,14 +1,14 @@
-const micromatch = require('micromatch');
-const prettier = require('prettier');
+import micromatch from 'micromatch';
+import prettier from 'prettier';
 
-const prettierSupportedExtensions = prettier
-  .getSupportInfo()
-  .languages.map(({ extensions }) => extensions)
+const prettierSupportInfo = await prettier.getSupportInfo();
+const prettierSupportedExtensions = prettierSupportInfo.languages
+  .map(({ extensions }) => extensions)
   .flat();
 
 const addQuotes = (a) => `"${a}"`;
 
-module.exports = (allStagedFiles) => {
+export default async (allStagedFiles) => {
   const eslintFiles = micromatch(allStagedFiles, ['**/*.{js,jsx,ts,tsx'], {
     dot: true,
   });

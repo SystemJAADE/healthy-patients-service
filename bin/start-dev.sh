@@ -10,10 +10,13 @@ set +a
 bin/wait-for-it.sh $DB_HOST:$DB_PORT
 
 # Reseteando la base de datos
-npx prisma migrate reset --force
+npx prisma migrate reset --force --skip-seed
 
 # Aplicando migraciones a la base de datos
 npx prisma migrate dev --name init
+
+# Ejecutando los seeds
+yarn run seed
 
 # Eliminando los archivos de migraciones creados por prisma
 # Esto se hace porque queremos mantener la base de datos sincronizada
