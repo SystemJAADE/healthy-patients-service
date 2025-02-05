@@ -8,10 +8,12 @@ import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
     ThrottlerModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        ttl: configService.get('RATELIMIT_TTL'),
-        limit: configService.get('RATELIMIT_LIMIT'),
-      }),
+      useFactory: (configService: ConfigService) => [
+        {
+          ttl: configService.get('RATELIMIT_TTL'),
+          limit: configService.get('RATELIMIT_LIMIT'),
+        },
+      ],
     }),
   ],
   providers: [
