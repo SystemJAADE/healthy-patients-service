@@ -1,4 +1,4 @@
-import { Gender } from '@prisma/client';
+import { DocumentType, Gender } from '@prisma/client';
 import { IsEnum, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class RegistrationDto {
@@ -29,6 +29,9 @@ export class RegistrationDto {
   @Length(2, 64)
   middleName?: string;
 
+  @IsEnum(DocumentType, { each: true })
+  documentType: DocumentType;
+
   @IsString()
   @IsNotEmpty()
   @Length(8, 32)
@@ -40,9 +43,6 @@ export class RegistrationDto {
   @Length(9)
   cellPhone?: string;
 
-  @Length(7)
-  homePhone: string;
-
   address: string;
 
   ubigeoDepartmentId: string;
@@ -50,4 +50,6 @@ export class RegistrationDto {
   ubigeoProvinceId: string;
 
   ubigeoDistrictId: string;
+
+  emailAddress: string;
 }

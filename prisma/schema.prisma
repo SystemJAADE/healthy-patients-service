@@ -20,10 +20,10 @@ model Account {
   secondSurname      String?           @map("second_surname") @db.VarChar(64)
   firstName          String?           @map("first_name") @db.VarChar(64)
   middleName         String?           @map("middle_name") @db.VarChar(64)
+  documentType       DocumentType?
   documentIdentity   String?           @map("document_identity") @db.VarChar(32)
   gender             Gender?
   cellPhone          String?           @map("cell_phone") @db.VarChar(32)
-  homePhone          String?           @map("home_phone") @db.VarChar(32)
   address            String?           @db.VarChar(256)
   ubigeoDepartmentId String?           @map("ubigeo_department_id")
   ubigeoDepartment   UbigeoDepartment? @relation(fields: [ubigeoDepartmentId], references: [id])
@@ -31,6 +31,7 @@ model Account {
   ubigeoProvince     UbigeoProvince?   @relation(fields: [ubigeoProvinceId], references: [id])
   ubigeoDistrictId   String?           @map("ubigeo_district_id")
   ubigeoDistrict     UbigeoDistrict?   @relation(fields: [ubigeoDistrictId], references: [id])
+  emailAddress       String?           @map("email_address") @db.VarChar(50)
   credentialId       String?           @unique @map("credential_id") @db.VarChar(36)
   credential         Credential?       @relation(fields: [credentialId], references: [id])
   refreshTokens      RefreshToken[]
@@ -246,6 +247,15 @@ model Permission {
 
   @@unique([accountId, subroleId])
   @@map("permissions")
+}
+
+enum DocumentType {
+  DNI           @map("1")
+  FOREIGN_CARD  @map("2")
+  PASSPORT      @map("3")
+  NOT_FOUND     @map("4")
+
+  @@map("document_type")
 }
 
 enum Gender {
