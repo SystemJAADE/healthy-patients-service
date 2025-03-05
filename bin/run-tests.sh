@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-echo "Cargando variables de entorno desde .env"
-set -a
-. ./.env
-set +a
+export DB_NAME="$TEST_DB_NAME"
+export DB_URL="mysql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 
 # Verificando la conexion a la base de datos MySQL
 bin/wait-for-it.sh $DB_HOST:$DB_PORT
@@ -25,5 +23,4 @@ yarn run seed
 # ya que eso es trabajo de los desarrolladores
 rm -rf prisma/migrations
 
-# Iniciando la aplicacion en modo desarrollo
-yarn run start:dev
+yarn run test

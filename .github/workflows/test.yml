@@ -1,0 +1,42 @@
+name: Test Application Code
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+
+env:
+  APP_PORT: '3000'
+  DB_HOST: 'mysql-test'
+  DB_PORT: '3306'
+  DB_USER: 'healthy_test'
+  DB_PASS: 'healthy_test'
+  TEST_DB_NAME: 'healthy_test'
+  DB_URL: 'mysql://healthy_test:healthy_test@mysql-test:3306/healthy_test'
+  SHADOW_DB_URL: 'mysql://root:healthy_test@mysql-test:3306/shadow_db'
+
+jobs:
+  run-test-suite:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone repository
+        run: |
+          git clone https://github.com/SystemJAADE/healthy-patients-service/
+          cd healthy-patients-service
+          git checkout ${{ github.head_ref || github.ref_name }}
+
+      - name: Set Node.js 20
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      
+      - name: Set file permissions
+        run: |
+          sudo chmod -R 777 .
+
+      - name: Run tests
+        uses: borales/actions-yarn@v4
+        with:
+          cmd: docker:run-tests
+          dir: healthy-patients-service
