@@ -80,11 +80,11 @@ describe('TriagesController', () => {
       documentIdentity: '12345678',
       gender: 'MALE',
       cellPhone: '987654321',
-      homePhone: '5432100',
       address: 'Av. Los Alamos #123',
       ubigeoDepartmentId: '01',
       ubigeoDistrictId: '010101',
       ubigeoProvinceId: '0101',
+      emailAddress: 'perez@mail.com',
     } as RegistrationDto;
 
     await oauthController.registration(account);
