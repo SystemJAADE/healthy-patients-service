@@ -1,0 +1,105 @@
+{
+  "name": "Patients Service",
+  "dockerComposeFile": "../docker-compose.dev.yml",
+  "service": "api",
+  "workspaceFolder": "/usr/src/app",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "prisma.prisma",
+        "christian-kohler.npm-intellisense",
+        "christian-kohler.path-intellisense",
+        "42crunch.vscode-openapi",
+        "arjun.swagger-viewer",
+        "redhat.vscode-yaml",
+        "ms-vscode.vscode-typescript-next",
+        "nestjs.vscode-nestjs",
+        "formulahendry.auto-rename-tag",
+        "streetsidesoftware.code-spell-checker",
+        "mikestead.dotenv",
+        "yoavbls.pretty-ts-errors",
+        "gruntfuggly.todo-tree",
+        "eamodio.gitlens",
+        "sdras.night-owl",
+        "GitHub.vscode-pull-request-github",
+        "GitHub.github-vscode-theme",
+        "mhutchie.git-graph",
+        "donjayamanne.githistory",
+        "rvest.vs-code-prettier-eslint"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[prisma]": {
+          "editor.defaultFormatter": "Prisma.prisma"
+        },
+        "files.associations": {
+          "*.env*": "dotenv",
+          "*.swagger.json": "json",
+          "*.openapi.json": "json"
+        },
+        "workbench.colorTheme": "Night Owl",
+        "workbench.colorCustomizations": {
+          "[Night Owl]": {
+            "activityBar.background": "#1B2738",
+            "sideBar.background": "#1B2738",
+            "editor.background": "#011627",
+            "statusBar.background": "#0B1D30",
+            "titleBar.activeBackground": "#1B2738"
+          }
+        },
+        "editor.tokenColorCustomizations": {
+          "[Night Owl]": {
+            "textMateRules": [
+              {
+                "scope": ["entity.name.type.class", "entity.name.class"],
+                "settings": {
+                  "foreground": "#82AAFF"
+                }
+              }
+            ]
+          }
+        },
+        "gitlens.showWelcomeOnInstall": false,
+        "gitlens.codeLens.enabled": true,
+        "git.autofetch": true,
+        "git.confirmSync": false,
+        "git.enableSmartCommit": true,
+        "git.branchProtection": ["main", "master"],
+        "git.branchProtectionPrompt": "alwaysPrompt",
+        "git.pullBeforeCheckout": true,
+        "githubPullRequests.createOnPublishBranch": "ask",
+        "githubPullRequests.defaultMergeMethod": "squash",
+        "githubPullRequests.pullBranch": "never",
+        "git-graph.repository.commits.showSignatureStatus": true
+      }
+    }
+  },
+
+  "postCreateCommand": "yarn install",
+
+  "remoteUser": "node",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts"
+    },
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "latest",
+      "ppa": true
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+
+  "forwardPorts": [3000, 3306]
+}

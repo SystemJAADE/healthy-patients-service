@@ -8,7 +8,7 @@
   "paths": {
     "/accounts/me": {
       "get": {
-        "tags": ["accounts"],
+        "tags": ["Accounts"],
         "summary": "Obtener datos propios de la cuenta autenticada",
         "responses": {
           "200": {
@@ -24,7 +24,7 @@
     },
     "/accounts/{username}": {
       "get": {
-        "tags": ["accounts"],
+        "tags": ["Accounts"],
         "summary": "Obtener cuenta por username",
         "parameters": [
           {
@@ -51,7 +51,7 @@
     },
     "/credentials": {
       "get": {
-        "tags": ["credentials"],
+        "tags": ["Credentials"],
         "summary": "Obtener todas las credenciales",
         "responses": {
           "200": {
@@ -67,7 +67,7 @@
     },
     "/oauth/registration": {
       "post": {
-        "tags": ["oauth"],
+        "tags": ["Oauth"],
         "summary": "Registro de usuario",
         "requestBody": {
           "required": true,
@@ -95,7 +95,7 @@
     },
     "/oauth/token": {
       "post": {
-        "tags": ["oauth"],
+        "tags": ["Oauth"],
         "summary": "Autorización de usuario",
         "requestBody": {
           "required": true,
@@ -123,7 +123,7 @@
     },
     "/oauth/change_password": {
       "post": {
-        "tags": ["oauth"],
+        "tags": ["Oauth"],
         "summary": "Recuperación de contraseña",
         "requestBody": {
           "required": true,
@@ -144,7 +144,7 @@
     },
     "/triages": {
       "get": {
-        "tags": ["triages"],
+        "tags": ["Triages"],
         "summary": "Obtener todos los triages",
         "responses": {
           "200": {
@@ -158,7 +158,7 @@
         ]
       },
       "post": {
-        "tags": ["triages"],
+        "tags": ["Triages"],
         "summary": "Crear un nuevo triage",
         "requestBody": {
           "required": true,
@@ -184,7 +184,7 @@
     },
     "/triages/{id}": {
       "get": {
-        "tags": ["triages"],
+        "tags": ["Triages"],
         "summary": "Obtener triage por ID",
         "parameters": [
           {
@@ -209,7 +209,7 @@
         ]
       },
       "put": {
-        "tags": ["triages"],
+        "tags": ["Triages"],
         "summary": "Actualizar triage por ID",
         "parameters": [
           {
@@ -244,7 +244,7 @@
         ]
       },
       "delete": {
-        "tags": ["triages"],
+        "tags": ["Triages"],
         "summary": "Eliminar triage por ID",
         "parameters": [
           {
@@ -271,7 +271,7 @@
     },
     "/ubigeo/departments": {
       "get": {
-        "tags": ["ubigeo"],
+        "tags": ["Ubigeo"],
         "summary": "Obtener todos los departamentos",
         "responses": {
           "200": {
@@ -282,7 +282,7 @@
     },
     "/ubigeo/provinces/{departmenId}": {
       "get": {
-        "tags": ["ubigeo"],
+        "tags": ["Ubigeo"],
         "summary": "Obtener todas las provincias de un departamento",
         "parameters": [
           {
@@ -304,7 +304,7 @@
     },
     "/ubigeo/districts/{departmentId}/{provinceId}": {
       "get": {
-        "tags": ["ubigeo"],
+        "tags": ["Ubigeo"],
         "summary": "Obtener todos los distritos de una provincia",
         "parameters": [
           {
