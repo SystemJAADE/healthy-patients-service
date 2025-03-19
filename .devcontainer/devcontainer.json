@@ -1,0 +1,65 @@
+{
+  "name": "Patients Service",
+  "dockerComposeFile": "../docker-compose.dev.yml",
+  "service": "api",
+  "workspaceFolder": "/usr/src/app",
+
+  // Optimizar las extensiones incluyendo solo las esenciales
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // Extensiones esenciales para desarrollo
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "prisma.prisma",
+        "nestjs.vscode-nestjs",
+        "ms-vscode.vscode-typescript-next",
+        "mikestead.dotenv",
+        // Git essentials
+        "eamodio.gitlens",
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        // Configuraciones críticas solamente
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        },
+        "[prisma]": {
+          "editor.defaultFormatter": "Prisma.prisma"
+        }
+      }
+    }
+  },
+
+  // Usar updateRemoteUserUID para evitar problemas de permisos
+  "updateRemoteUserUID": true,
+
+  // Usar postStartCommand en lugar de postCreateCommand
+  "postStartCommand": "yarn install",
+
+  // Configurar el usuario remoto
+  "remoteUser": "node",
+
+  // Optimizar features
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "lts",
+      "nodeGypDependencies": false // Deshabilitar dependencias innecesarias
+    }
+  },
+
+  // Configurar puertos específicos
+  "forwardPorts": [3000, 3306],
+
+  // Añadir configuraciones de rendimiento
+  "workspaceMount": "source=${localWorkspaceFolder},target=/usr/src/app,type=bind,consistency=cached",
+  "mounts": [
+    "source=${localEnv:HOME}/.yarn-cache,target=/usr/local/share/.cache/yarn,type=bind,consistency=cached"
+  ]
+}

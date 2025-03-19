@@ -1,14 +1,14 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { AccountsRepository } from './accounts.repository';
-import { Account } from '@prisma/client';
-import { AccountDto } from './dto/account.dto';
-import * as jwt from 'jsonwebtoken';
-import { JwtPayloadDto } from './dto/jwt-payload.dto';
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import { BufferedImageDto } from './dto/buffered-image.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { Account } from '@prisma/client';
 import * as FormData from 'form-data';
+import * as jwt from 'jsonwebtoken';
+import { firstValueFrom } from 'rxjs';
+import { AccountsRepository } from './accounts.repository';
+import { AccountDto } from './dto/account.dto';
+import { BufferedImageDto } from './dto/buffered-image.dto';
+import { JwtPayloadDto } from './dto/jwt-payload.dto';
 
 @Injectable()
 export class AccountsService {
@@ -19,18 +19,15 @@ export class AccountsService {
   ) {}
 
   public async findByCredentialIdentifier(identifier: string): Promise<any> {
-    const account = await this.repository.getAccountByCredentialIdentifier(
-      identifier,
-    );
+    const account =
+      await this.repository.getAccountByCredentialIdentifier(identifier);
     if (!account) {
       throw new HttpException('Account not found', HttpStatus.NOT_FOUND);
     }
     return account;
   }
 
-  public async findCurrentUser(
-    authorization: string,
-  ): Promise<Omit<Account, 'roleId' | 'subroleId'>> {
+  public async findCurrentUser(authorization: string): Promise<Account> {
     const accessToken = authorization.split(' ')[1];
     const decodedToken = jwt.decode(accessToken) as JwtPayloadDto;
     const identifier = decodedToken.current_account.identifier;
@@ -40,6 +37,16 @@ export class AccountsService {
   public async update(id: string, data: AccountDto): Promise<Account> {
     return await this.repository.updateAccount({
       data,
+      where: { id },
+    });
+  }
+
+  public async updatePermissions(
+    id: string,
+    subroleIds: number[],
+  ): Promise<{ message: string }> {
+    return this.repository.updatePermissions({
+      subroleIds,
       where: { id },
     });
   }

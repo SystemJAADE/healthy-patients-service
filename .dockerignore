@@ -14,3 +14,8 @@ README.md
 tslint.json
 nodemon.json
 .env
+
+# Archivos adicionales
+npm-debug.log
+.git
+*.log

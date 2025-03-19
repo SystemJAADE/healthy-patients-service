@@ -13,11 +13,11 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { RoleGuard, Roles } from '../helpers/role.helper';
 import { AccountsService } from './accounts.service';
 import { AccountDto } from './dto/account.dto';
-import { FileInterceptor } from '@nestjs/platform-express';
 import { BufferedImageDto } from './dto/buffered-image.dto';
 
 @Controller('accounts')
@@ -27,7 +27,7 @@ export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
   @Get('/me')
-  @Roles('Admin', 'Doctor', 'Patient', 'Not Fully Registered')
+  @Roles('Admin', 'Doctor', 'Patient', 'Not fully registered')
   public findCurrentUser(@Headers('authorization') authorization: string) {
     return this.accountsService.findCurrentUser(authorization);
   }
@@ -42,6 +42,15 @@ export class AccountsController {
   @Roles('Admin', 'Doctor')
   public update(@Param('id') id: string, @Body() data: AccountDto) {
     return this.accountsService.update(id, data);
+  }
+
+  @Put('permissions/:id')
+  @Roles('Admin', 'Doctor')
+  public updatePermissions(
+    @Param('id') id: string,
+    @Body() subroleIds: number[],
+  ) {
+    return this.accountsService.updatePermissions(id, subroleIds);
   }
 
   @Get(':id/avatar')

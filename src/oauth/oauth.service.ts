@@ -8,8 +8,8 @@ import {
   Subrole,
 } from '@prisma/client';
 import { Algorithm, sign, verify } from 'jsonwebtoken';
-import { DEFAULT_SUBROLE_ID } from '../constants';
 import { v4 } from 'uuid';
+import { DEFAULT_SUBROLE_ID } from '../constants';
 import {
   access_token_expired_signature,
   account_blocked,
@@ -271,6 +271,12 @@ export class OauthService {
       }[];
     },
   ) {
+    console.log('Algorithm used:', this.configService.get('JWT_ALGORITHM'));
+    console.log(
+      'Secret key length:',
+      this.configService.get('JWT_SECRET_KEY').length,
+    );
+
     const refresh = await this.prisma.refreshToken.create({
       data: {
         accountId: account.id,
@@ -347,8 +353,16 @@ export class OauthService {
 
   public verifyToken<T>(jwt_token: string, is_access_token = true) {
     try {
-      return verify(jwt_token, this.configService.get('JWT_SECRET_KEY')) as T;
+      const secretKey = this.configService.get('JWT_SECRET_KEY');
+      console.log('Algoritmo usado:', this.configService.get('JWT_ALGORITHM'));
+
+      return verify(jwt_token, secretKey, {
+        algorithms: [this.configService.get('JWT_ALGORITHM')],
+      }) as T;
     } catch (error) {
+      console.error('Error completo:', error);
+      console.error('Mensaje de error:', error.message);
+
       if (is_access_token) {
         access_token_expired_signature({ raise: true });
       } else {
@@ -361,7 +375,7 @@ export class OauthService {
     account: Account & {
       credential: Credential;
       permission: {
-        subrole?: (Subrole & { role: { id: number; name: string } }) | null; // Incluye el role aquí
+        subrole?: (Subrole & { role: { id: number; name: string } }) | null;
       }[];
     },
   ): IJWTPayload {
