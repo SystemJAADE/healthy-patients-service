@@ -4,31 +4,20 @@
   "service": "api",
   "workspaceFolder": "/usr/src/app",
 
+  // Optimizar las extensiones incluyendo solo las esenciales
   "customizations": {
     "vscode": {
       "extensions": [
+        // Extensiones esenciales para desarrollo
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
         "prisma.prisma",
-        "christian-kohler.npm-intellisense",
-        "christian-kohler.path-intellisense",
-        "42crunch.vscode-openapi",
-        "arjun.swagger-viewer",
-        "redhat.vscode-yaml",
-        "ms-vscode.vscode-typescript-next",
         "nestjs.vscode-nestjs",
-        "formulahendry.auto-rename-tag",
-        "streetsidesoftware.code-spell-checker",
+        "ms-vscode.vscode-typescript-next",
         "mikestead.dotenv",
-        "yoavbls.pretty-ts-errors",
-        "gruntfuggly.todo-tree",
+        // Git essentials
         "eamodio.gitlens",
-        "sdras.night-owl",
-        "GitHub.vscode-pull-request-github",
-        "GitHub.github-vscode-theme",
-        "mhutchie.git-graph",
-        "donjayamanne.githistory",
-        "rvest.vs-code-prettier-eslint"
+        "GitHub.vscode-pull-request-github"
       ],
       "settings": {
         "editor.formatOnSave": true,
@@ -37,69 +26,40 @@
         "editor.codeActionsOnSave": {
           "source.fixAll.eslint": true
         },
+        // Configuraciones críticas solamente
         "[typescript]": {
           "editor.defaultFormatter": "esbenp.prettier-vscode"
         },
         "[prisma]": {
           "editor.defaultFormatter": "Prisma.prisma"
-        },
-        "files.associations": {
-          "*.env*": "dotenv",
-          "*.swagger.json": "json",
-          "*.openapi.json": "json"
-        },
-        "workbench.colorTheme": "Night Owl",
-        "workbench.colorCustomizations": {
-          "[Night Owl]": {
-            "activityBar.background": "#1B2738",
-            "sideBar.background": "#1B2738",
-            "editor.background": "#011627",
-            "statusBar.background": "#0B1D30",
-            "titleBar.activeBackground": "#1B2738"
-          }
-        },
-        "editor.tokenColorCustomizations": {
-          "[Night Owl]": {
-            "textMateRules": [
-              {
-                "scope": ["entity.name.type.class", "entity.name.class"],
-                "settings": {
-                  "foreground": "#82AAFF"
-                }
-              }
-            ]
-          }
-        },
-        "gitlens.showWelcomeOnInstall": false,
-        "gitlens.codeLens.enabled": true,
-        "git.autofetch": true,
-        "git.confirmSync": false,
-        "git.enableSmartCommit": true,
-        "git.branchProtection": ["main", "master"],
-        "git.branchProtectionPrompt": "alwaysPrompt",
-        "git.pullBeforeCheckout": true,
-        "githubPullRequests.createOnPublishBranch": "ask",
-        "githubPullRequests.defaultMergeMethod": "squash",
-        "githubPullRequests.pullBranch": "never",
-        "git-graph.repository.commits.showSignatureStatus": true
+        }
       }
     }
   },
 
-  "postCreateCommand": "yarn install",
+  // Usar updateRemoteUserUID para evitar problemas de permisos
+  "updateRemoteUserUID": true,
 
+  // Usar postStartCommand en lugar de postCreateCommand
+  "postStartCommand": "yarn install",
+
+  // Configurar el usuario remoto
   "remoteUser": "node",
 
+  // Optimizar features
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts"
-    },
-    "ghcr.io/devcontainers/features/git:1": {
-      "version": "latest",
-      "ppa": true
-    },
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+      "version": "lts",
+      "nodeGypDependencies": false // Deshabilitar dependencias innecesarias
+    }
   },
 
-  "forwardPorts": [3000, 3306]
+  // Configurar puertos específicos
+  "forwardPorts": [3000, 3306],
+
+  // Añadir configuraciones de rendimiento
+  "workspaceMount": "source=${localWorkspaceFolder},target=/usr/src/app,type=bind,consistency=cached",
+  "mounts": [
+    "source=${localEnv:HOME}/.yarn-cache,target=/usr/local/share/.cache/yarn,type=bind,consistency=cached"
+  ]
 }

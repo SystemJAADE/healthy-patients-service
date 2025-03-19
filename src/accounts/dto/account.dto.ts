@@ -56,10 +56,6 @@ export class AccountDto {
   emailAddress: string;
 
   @IsArray()
-  @IsNotEmpty()
-  roleIds: number[];
-
-  @IsArray()
   @IsOptional()
   subroleIds?: number[];
 }

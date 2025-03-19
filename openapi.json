@@ -5,6 +5,11 @@
     "description": "Microservicio para el sistema Healthy.",
     "version": "0.0.1"
   },
+  "servers": [
+    { "url": "http://localhost:3000" },
+    { "url": "http://127.0.0.1:3000" },
+    { "url": "https://api.healthy.com" }
+  ],
   "paths": {
     "/accounts/me": {
       "get": {
@@ -41,6 +46,91 @@
           "200": {
             "description": "Detalles de la cuenta"
           }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/accounts/{id}/avatar": {
+      "get": {
+        "tags": ["Accounts"],
+        "summary": "Obtener avatar de usuario",
+        "description": "Recupera el avatar de un usuario específico.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID de la cuenta del usuario",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar del usuario recuperado correctamente",
+            "content": {
+              "image/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": { "description": "No autorizado - Token inválido o expirado" },
+          "404": { "description": "Avatar no encontrado" },
+          "500": { "description": "Error interno del servidor" }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/accounts/{accountId}/avatar/upload": {
+      "post": {
+        "tags": ["Accounts"],
+        "summary": "Subir avatar de usuario",
+        "description": "Permite subir una imagen como avatar para un usuario específico. Se aceptan formatos JPEG y PNG.",
+        "parameters": [
+          {
+            "name": "accountId",
+            "in": "path",
+            "required": true,
+            "description": "ID de la cuenta del usuario",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "image": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Archivo de imagen a subir (JPEG o PNG)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Avatar subido exitosamente" },
+          "400": {
+            "description": "Solicitud incorrecta - Archivo faltante o inválido"
+          },
+          "401": { "description": "No autorizado - Token inválido o expirado" },
+          "413": { "description": "Archivo demasiado grande" },
+          "415": { "description": "Formato de archivo no soportado" },
+          "500": { "description": "Error interno del servidor" }
         },
         "security": [
           {

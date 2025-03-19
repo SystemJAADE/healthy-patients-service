@@ -100,7 +100,7 @@ export class AccountsRepository {
   async updateAccount(params: {
     where: Prisma.AccountWhereUniqueInput;
     data: AccountDto;
-  }): Promise<Omit<Account, 'roleId' | 'subroleId'>> {
+  }): Promise<Account> {
     const { where, data } = params;
 
     return this.prisma.$transaction(async (tx) => {
@@ -136,28 +136,6 @@ export class AccountsRepository {
         },
       });
 
-      if (data.roleIds && data.subroleIds) {
-        await tx.permission.deleteMany({
-          where: {
-            accountId: updatedAccount.id,
-          },
-        });
-
-        const permissionsData = data.roleIds
-          .map((roleId) =>
-            data.subroleIds.map((subroleId) => ({
-              accountId: updatedAccount.id,
-              roleId: roleId,
-              subroleId: subroleId,
-            })),
-          )
-          .flat();
-
-        await tx.permission.createMany({
-          data: permissionsData,
-        });
-      }
-
       const accountWithPermissions = await tx.account.findFirst({
         where: {
           id: updatedAccount.id,
@@ -180,17 +158,88 @@ export class AccountsRepository {
       });
 
       if (accountWithPermissions && accountWithPermissions.permission) {
+        // Crear un Map para agrupar por roleId
+        const roleMap = new Map();
+
+        // Agrupar permisos por rol
         accountWithPermissions.permission.forEach((perm) => {
           const role = perm.subrole.role;
-          if (role) {
-            role.subroles = role.subroles.filter(
-              (subrole) => subrole.id === perm.subroleId,
-            );
+          if (!roleMap.has(role.id)) {
+            roleMap.set(role.id, {
+              role: {
+                id: role.id,
+                name: role.name,
+                subroles: [],
+              },
+            });
+          }
+
+          // Añadir subrole si no existe ya
+          const existingRole = roleMap.get(role.id);
+          const subroleExists = existingRole.role.subroles.some(
+            (sr) => sr.id === perm.subrole.id,
+          );
+
+          if (!subroleExists) {
+            existingRole.role.subroles.push({
+              id: perm.subrole.id,
+              name: perm.subrole.name,
+            });
           }
         });
+
+        // Convertir el Map a array y asignar al objeto account
+        const formattedPermissions = Array.from(roleMap.values());
+
+        // Crear un nuevo objeto con la estructura deseada
+        const formattedAccount = {
+          ...accountWithPermissions,
+          permissions: formattedPermissions,
+          permission: undefined, // Eliminar el campo original de permission
+        };
+
+        return formattedAccount;
       }
 
       return accountWithPermissions;
+    });
+  }
+
+  async updatePermissions(params: {
+    where: Prisma.AccountWhereUniqueInput;
+    subroleIds: number[];
+  }): Promise<{ message: string }> {
+    const { where, subroleIds } = params;
+
+    return this.prisma.$transaction(async (tx) => {
+      // Primero verificamos que la cuenta existe
+      const account = await tx.account.findUnique({
+        where,
+        include: {
+          permission: true,
+        },
+      });
+
+      if (!account) {
+        throw new Error('Account not found');
+      }
+
+      // Eliminamos los permisos existentes
+      await tx.permission.deleteMany({
+        where: {
+          accountId: account.id,
+        },
+      });
+
+      // Creamos los nuevos permisos
+      await tx.permission.createMany({
+        data: subroleIds.map((subroleId) => ({
+          accountId: account.id,
+          subroleId: subroleId,
+        })),
+      });
+
+      return { message: 'Permissions updated successfully' };
     });
   }
 
