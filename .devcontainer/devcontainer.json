@@ -1,0 +1,45 @@
+{
+  "name": "Patients Service",
+  "dockerComposeFile": "../docker-compose.dev.yml",
+  "service": "api",
+  "workspaceFolder": "/usr/src/app",
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "prisma.prisma",
+        "ms-vscode.vscode-typescript-next",
+        "mikestead.dotenv"
+      ],
+      "settings": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "typescript.updateImportsOnFileMove.enabled": "always",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "always"
+        },
+        "[typescript]": {
+          "editor.defaultFormatter": "esbenp.prettier-vscode"
+        }
+      }
+    }
+  },
+
+  "updateRemoteUserUID": true,
+  "postStartCommand": "yarn install",
+  "remoteUser": "node",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1.6.2": {
+      "version": "lts",
+      "nodeGypDependencies": false
+    }
+  },
+
+  "forwardPorts": ["${localEnv:APP_PORT}", "${localEnv:DB_PORT}"],
+  "mounts": [
+    "source=${localEnv:HOME}/.yarn-cache,target=/usr/local/share/.cache/yarn,type=bind,consistency=cached"
+  ]
+}
