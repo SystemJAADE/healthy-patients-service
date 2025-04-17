@@ -332,6 +332,38 @@
           }
         }
       }
+    },
+    "/patients/register": {
+      "post": {
+        "tags": ["patients"],
+        "summary": "Registrar un nuevo paciente",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePatientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Paciente registrado exitosamente"
+          },
+          "404": {
+            "description": "Cuenta no encontrada"
+          },
+          "409": {
+            "description": "Ya existe un paciente para esta cuenta"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -573,6 +605,105 @@
           "bloodOxygen",
           "temperature",
           "respiratoryRate"
+        ]
+      },
+      "CreatePatientDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "description": "Primer nombre",
+            "example": "Juan"
+          },
+          "middleName": {
+            "type": "string",
+            "description": "Segundo nombre",
+            "example": "Carlos"
+          },
+          "firstSurname": {
+            "type": "string",
+            "description": "Primer apellido",
+            "example": "Perez"
+          },
+          "secondSurname": {
+            "type": "string",
+            "description": "Segundo apellido",
+            "example": "Gomez"
+          },
+          "documentType": {
+            "type": "string",
+            "description": "Tipo de documento",
+            "enum": ["DNI", "FOREIGN_CARD", "PASSPORT", "NOT_FOUND"],
+            "example": "DNI"
+          },
+          "documentIdentity": {
+            "type": "string",
+            "description": "Documento de identidad",
+            "example": "12345678"
+          },
+          "gender": {
+            "type": "string",
+            "description": "Género",
+            "enum": ["MALE", "FEMALE", "NEITHER"],
+            "example": "MALE"
+          },
+          "cellPhone": {
+            "type": "string",
+            "description": "Celular",
+            "example": "987654321"
+          },
+          "address": {
+            "type": "string",
+            "description": "Dirección",
+            "example": "Av. Los Alamos #123"
+          },
+          "ubigeoDepartmentId": {
+            "type": "string",
+            "description": "Departamento",
+            "example": "01"
+          },
+          "ubigeoProvinceId": {
+            "type": "string",
+            "description": "Provincia",
+            "example": "0101"
+          },
+          "ubigeoDistrictId": {
+            "type": "string",
+            "description": "Distrito",
+            "example": "010101"
+          },
+          "emailAddress": {
+            "type": "string",
+            "description": "Dirección de correo electrónico",
+            "example": "test@mail.com"
+          },
+          "bloodType": {
+            "type": "string",
+            "description": "Tipo de sangre",
+            "example": "O+"
+          },
+          "allergies": {
+            "type": "string",
+            "description": "Alergias",
+            "example": "Penicilina"
+          },
+          "personalPathologicalHistory": {
+            "type": "string",
+            "description": "Historial patológico personal",
+            "example": "Diabetes tipo 2"
+          },
+          "familyPathologicalHistory": {
+            "type": "string",
+            "description": "Historial patológico familiar",
+            "example": "Hipertensión arterial"
+          }
+        },
+        "required": [
+          "firstName",
+          "firstSurname",
+          "documentType",
+          "documentIdentity",
+          "gender"
         ]
       }
     },

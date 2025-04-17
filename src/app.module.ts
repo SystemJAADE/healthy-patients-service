@@ -9,6 +9,7 @@ import { OAuthMiddleware } from './oauth/oauth.middleware';
 import { RatelimitModule } from './ratelimit/ratelimit.module';
 import { TriagesModule } from './triages/triages.module';
 import { UbigeoModule } from './ubigeo/ubigeo.module';
+import { PatientsModule } from './patients/patients.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { UbigeoModule } from './ubigeo/ubigeo.module';
     OauthModule,
     TriagesModule,
     UbigeoModule,
+    PatientsModule,
   ],
   controllers: [],
   providers: [],
