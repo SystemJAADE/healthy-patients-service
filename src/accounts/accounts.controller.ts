@@ -27,7 +27,7 @@ export class AccountsController {
   constructor(private readonly accountsService: AccountsService) {}
 
   @Get('/me')
-  @Roles('Admin', 'Doctor', 'Patient', 'Not Fully Registered')
+  @Roles('Admin', 'Doctor', 'Patient', 'Not fully registered')
   public findCurrentUser(@Headers('authorization') authorization: string) {
     return this.accountsService.findCurrentUser(authorization);
   }
